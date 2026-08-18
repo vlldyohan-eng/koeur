@@ -1,43 +1,336 @@
 <!doctype html>
-<html lang="fr"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#ff3d78"><meta name="description" content="Koeur — rencontres et compatibilité intelligente">
-<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png">
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Koeur ♥</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--p:#ff3d78;--ink:#18131b;--bg:#f7f6fa;--ok:#159a68;--gold:#e9a920}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--ink)}
-.app{max-width:480px;margin:auto;min-height:100vh;background:#fff}.top{padding:16px 18px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:5}.logo{font-size:29px;font-weight:900;color:var(--p)}
-main{padding:18px 18px 90px}.screen{display:none}.active{display:block}.box{padding:16px;border:1px solid #eee;border-radius:18px;margin:10px 0}.hero{padding:18px;border-radius:22px;background:linear-gradient(135deg,#211725,#654b77);color:white}.card{height:430px;border-radius:25px;background:linear-gradient(145deg,#e9b6c5,#59445e);color:white;padding:20px;display:flex;align-items:end}.name{font-size:30px;font-weight:900}.score{font-size:52px;font-weight:900}.bar{height:9px;background:#eee;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--p)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metric{background:#faf8ff;padding:12px;border-radius:14px}.cta{width:100%;padding:14px;border:0;border-radius:12px;background:var(--p);color:#fff;font-weight:800}.secondary{background:#eee;color:#222}.row{display:flex;gap:8px}.row>*{flex:1}input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 12px}.mission{display:flex;justify-content:space-between;padding:12px;border:1px solid #eee;border-radius:12px;margin:8px 0}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:10px}.nav button{border:0;background:none;font-size:11px;color:#777}.nav .sel{color:var(--p);font-weight:800}.small{font-size:12px;color:#777}.verified{color:var(--ok)}
-</style></head><body><div class="app">
-<div class="top"><div class="logo">Koeur ♥</div><span id="status">Démo</span></div><main>
-<section id="home" class="screen active"><h1>Bienvenue sur Koeur ❤️</h1><p>Une application de rencontre pensée autour des affinités et des valeurs.</p>
-<div class="hero"><h2>🧠 Koeur IA</h2><p>Analyse indicative de vos affinités, expliquée simplement.</p></div>
-<div class="box"><h3>Profil démo</h3><input id="name" placeholder="Votre prénom"><input id="age" type="number" min="18" placeholder="Âge (18+)"><input id="city" placeholder="Ville"><button class="cta" onclick="start()">Entrer dans Koeur</button></div></section>
+body{margin:0;font-family:Arial;background:#f7f6fa;color:#18131b}
+.app{max-width:480px;margin:auto;min-height:100vh;background:white}
+header{padding:18px;font-size:28px;font-weight:bold;color:#ff3d78}
+main{padding:18px 18px 90px}
+section{display:none}.active{display:block}
+input,textarea,button{width:100%;padding:13px;margin:7px 0;box-sizing:border-box;border-radius:12px;border:1px solid #ddd}
+button{background:#ff3d78;color:white;border:0;font-weight:bold}
+.secondary{background:#eee;color:#222}
+.card{padding:18px;border-radius:20px;background:#faf8ff;margin:12px 0}
+.nav{position:fixed;bottom:0;width:min(480px,100%);display:flex;background:white;border-top:1px solid #ddd}
+.nav button{background:white;color:#555;border-radius:0;margin:0}
+h1{margin-top:0}
+.small{color:#777;font-size:13px}
+</style>
+</head>
 
-<section id="discover" class="screen"><h1>Découvrir 💕</h1><div class="card"><div><div class="name">Camille, 28 ✓</div><p>📍 Dijon · Voyages · Musique · Sport</p><p>Authenticité · humour · famille</p></div></div><div class="row" style="margin:15px 0"><button class="cta secondary" onclick="alert('Profil ignoré')">✕</button><button class="cta" onclick="showAI()">🧠 Analyser</button><button class="cta" onclick="like()">❤️</button></div></section>
+<body>
+<div class="app">
 
-<section id="ai" class="screen"><h1>Compatibilité IA 🧠</h1><div class="hero"><div>Compatibilité</div><div class="score">87%</div><div class="bar"><i style="width:87%"></i></div><p>🟢 Fort potentiel déclaré</p></div><div class="grid"><div class="metric"><b>94%</b><br>Valeurs</div><div class="metric"><b>91%</b><br>Communication</div><div class="metric"><b>86%</b><br>Projet de vie</div><div class="metric"><b>76%</b><br>Mode de vie</div></div><div class="box"><b>Pourquoi ?</b><p>Vos réponses présentent des attentes proches. Le rythme de vie est le principal point à discuter.</p><p class="small">Ce score est indicatif et ne garantit pas une relation.</p></div><button class="cta" onclick="like()">Créer le Koeur ❤️</button></section>
+<header>Koeur ♥</header>
 
-<section id="elements" class="screen"><h1>⭐ Les 5 éléments</h1><div class="hero"><h2 id="element">🔥 Feu</h2><p id="xp">0 / 100 XP</p><div class="bar"><i id="xpbar" style="width:0%;background:#fff"></i></div></div><div class="mission">Compléter une mission <button onclick="mission()">+25 XP</button></div><div class="box">🔥 Feu → 💧 Eau → 🌬️ Air → 🌍 Terre → ✨ Éther</div></section>
+<main>
 
-<section id="premium" class="screen"><h1>Premium 💎</h1><div class="hero"><h2>⭐ Koeur Étoile</h2><div class="score" style="font-size:38px">9,99 € <small>/an</small></div><button class="cta" onclick="premium()">Activer la démo</button></div><div class="box">⭐ Mise en avant<br>🧠 Analyse avancée<br>🔎 Filtres<br>✨ Missions Premium<br>🚫 Sans publicité</div></section>
+<section id="auth" class="active">
+<h1>Bienvenue ❤️</h1>
+<p>Rencontre des personnes qui partagent tes valeurs.</p>
 
-<section id="profile" class="screen"><h1>Mon profil 👤</h1><div class="box" id="profileBox">Aucun profil.</div><button class="cta secondary" onclick="resetApp()">Réinitialiser la démo</button></section>
-</main><div class="nav">
-<button onclick="tab('discover',this)">🔥<br>Découvrir</button><button onclick="tab('ai',this)">🧠<br>IA</button><button onclick="tab('elements',this)">⭐<br>Éléments</button><button onclick="tab('premium',this)">💎<br>Premium</button><button onclick="tab('profile',this)">👤<br>Profil</button>
-</div></div>
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Mot de passe">
+<input id="firstName" placeholder="Prénom">
+<input id="birthDate" type="date">
+<input id="city" placeholder="Ville">
+
+<button onclick="signup()">Créer mon compte</button>
+<button class="secondary" onclick="login()">Se connecter</button>
+
+<p id="authMsg" class="small"></p>
+</section>
+
+<section id="discover">
+<h1>Découvrir 💕</h1>
+<div id="profiles"></div>
+</section>
+
+<section id="matches">
+<h1>Mes matchs 💕</h1>
+<div id="matchesList"></div>
+</section>
+
+<section id="messages">
+<h1>Messages 💬</h1>
+<div id="messagesList"></div>
+<input id="messageInput" placeholder="Écrire un message">
+<button onclick="sendMessage()">Envoyer</button>
+</section>
+
+<section id="profile">
+<h1>Mon profil 👤</h1>
+<div id="myProfile"></div>
+<button class="secondary" onclick="logout()">Se déconnecter</button>
+</section>
+
+</main>
+
+<div class="nav" id="nav" style="display:none">
+<button onclick="show('discover');loadProfiles()">💕<br>Découvrir</button>
+<button onclick="show('matches');loadMatches()">💖<br>Matchs</button>
+<button onclick="show('messages');loadMatches()">💬<br>Messages</button>
+<button onclick="show('profile');loadProfile()">👤<br>Profil</button>
+</div>
+
+</div>
+
 <script>
-let me=JSON.parse(localStorage.getItem('koeur_pwa_me')||'null'),xp=+localStorage.getItem('koeur_pwa_xp')||0;
-function start(){let n=name.value.trim(),a=+age.value,c=city.value.trim();if(!n||a<18||!c){alert('Prénom, âge 18+ et ville sont requis.');return}me={n,a,c};localStorage.setItem('koeur_pwa_me',JSON.stringify(me));load()}
-function load(){if(!me)return;home.classList.remove('active');profileBox.innerHTML='<b>'+me.n+', '+me.a+'</b><p>📍 '+me.c+'</p><p class="verified">✓ Profil démo actif</p>';xpText();tab('discover',document.querySelector('.nav button'))}
-function tab(id,b){if(!me){alert('Créez votre profil.');return}document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')}
-function showAI(){tab('ai',document.querySelectorAll('.nav button')[1])}
-function like(){alert('Koeur envoyé ❤️ (mode démo)')}
-function mission(){xp=Math.min(100,xp+25);localStorage.setItem('koeur_pwa_xp',xp);xpText();if(xp===100){element.textContent='💧 Eau';alert('Élément Eau débloqué !')}}
-function xpText(){xpEl=document.getElementById('xp');xpEl.textContent=xp+' / 100 XP';document.getElementById('xpbar').style.width=xp+'%'}
-function premium(){localStorage.setItem('koeur_pwa_premium','1');alert('Premium activé en démo — aucun paiement réel.')}
-function resetApp(){localStorage.clear();location.reload()}
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-if(me)load();else xpText();
-</script></body></html>
+const SUPABASE_URL="https://sttmiacttpkvzunlggog.supabase.co";
+const SUPABASE_KEY="sb_publishable_RKRc0ZugsLnIyFpuKz1org_Y0gxBNwq";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let user=null;
+let selectedMatch=null;
+
+function show(id){
+ document.querySelectorAll("section").forEach(x=>x.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+}
+
+async function signup(){
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+ const first_name=document.getElementById("firstName").value.trim();
+ const birth_date=document.getElementById("birthDate").value;
+ const city=document.getElementById("city").value.trim();
+
+ if(!email||!password||!first_name||!birth_date){
+  authMsg.textContent="Remplis tous les champs obligatoires.";
+  return;
+ }
+
+ const {data,error}=await db.auth.signUp({
+  email,
+  password,
+  options:{data:{first_name,birth_date}}
+ });
+
+ if(error){
+  authMsg.textContent=error.message;
+  return;
+ }
+
+ if(data.user){
+  await db.from("profiles").upsert({
+   id:data.user.id,
+   first_name,
+   birth_date,
+   city
+  });
+ }
+
+ authMsg.textContent="Compte créé. Vérifie ton email si nécessaire.";
+}
+
+async function login(){
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+
+ const {data,error}=await db.auth.signInWithPassword({email,password});
+
+ if(error){
+  authMsg.textContent=error.message;
+  return;
+ }
+
+ user=data.user;
+ await startApp();
+}
+
+async function startApp(){
+ document.getElementById("auth").classList.remove("active");
+ document.getElementById("nav").style.display="flex";
+ show("discover");
+ await loadProfiles();
+}
+
+async function loadProfiles(){
+ const {data,error}=await db
+  .from("profiles")
+  .select("*")
+  .neq("id",user.id)
+  .limit(20);
+
+ if(error){
+  profiles.innerHTML="<p>Erreur de chargement.</p>";
+  return;
+ }
+
+ if(!data.length){
+  profiles.innerHTML="<p>Aucun profil disponible pour le moment.</p>";
+  return;
+ }
+
+ profiles.innerHTML=data.map(p=>`
+ <div class="card">
+  <h2>${escapeHtml(p.first_name)}, ${age(p.birth_date)}</h2>
+  <p>📍 ${escapeHtml(p.city||"")}</p>
+  <p>${escapeHtml(p.bio||"Pas encore de présentation.")}</p>
+  <button onclick="likeUser('${p.id}')">❤️ J'aime</button>
+ </div>
+ `).join("");
+}
+
+async function likeUser(id){
+ const {error}=await db.from("likes").insert({
+  from_user:user.id,
+  to_user:id
+ });
+
+ if(error && !error.message.includes("duplicate")){
+  alert(error.message);
+  return;
+ }
+
+ alert("Koeur envoyé ❤️");
+
+ await loadMatches();
+}
+
+async function loadMatches(){
+ const {data,error}=await db
+  .from("matches")
+  .select("*")
+  .or(`user_a.eq.${user.id},user_b.eq.${user.id}`);
+
+ if(error){
+  matchesList.innerHTML="<p>Erreur.</p>";
+  return;
+ }
+
+ if(!data.length){
+  matchesList.innerHTML="<p>Pas encore de match.</p>";
+  return;
+ }
+
+ const ids=data.map(m=>m.user_a===user.id?m.user_b:m.user_a);
+
+ const {data:profiles}=await db
+  .from("profiles")
+  .select("*")
+  .in("id",ids);
+
+ matchesList.innerHTML=(profiles||[]).map(p=>`
+ <div class="card">
+  <h2>${escapeHtml(p.first_name)}</h2>
+  <p>💕 Vous vous êtes likés !</p>
+  <button onclick="openChat('${findMatch(data,p.id)?.id||""}')">💬 Message</button>
+ </div>
+ `).join("");
+}
+
+function findMatch(list,id){
+ return list.find(m=>m.user_a===id||m.user_b===id);
+}
+
+async function openChat(matchId){
+ selectedMatch=matchId;
+ show("messages");
+ await loadMessages();
+}
+
+async function loadMessages(){
+ if(!selectedMatch){
+  messagesList.innerHTML="<p>Sélectionne un match.</p>";
+  return;
+ }
+
+ const {data,error}=await db
+  .from("messages")
+  .select("*")
+  .eq("match_id",selectedMatch)
+  .order("created_at",{ascending:true});
+
+ if(error){
+  messagesList.textContent=error.message;
+  return;
+ }
+
+ messagesList.innerHTML=(data||[]).map(m=>`
+ <div class="card">
+  <b>${m.sender_id===user.id?"Moi":"Match"}</b>
+  <p>${escapeHtml(m.content)}</p>
+ </div>
+ `).join("");
+}
+
+async function sendMessage(){
+ if(!selectedMatch)return;
+
+ const input=document.getElementById("messageInput");
+ const content=input.value.trim();
+
+ if(!content)return;
+
+ const {error}=await db.from("messages").insert({
+  match_id:selectedMatch,
+  sender_id:user.id,
+  content
+ });
+
+ if(error){
+  alert(error.message);
+  return;
+ }
+
+ input.value="";
+ await loadMessages();
+}
+
+async function loadProfile(){
+ const {data,error}=await db
+  .from("profiles")
+  .select("*")
+  .eq("id",user.id)
+  .single();
+
+ if(error)return;
+
+ myProfile.innerHTML=`
+ <div class="card">
+  <h2>${escapeHtml(data.first_name)}</h2>
+  <p>📍 ${escapeHtml(data.city||"")}</p>
+  <p>${escapeHtml(data.bio||"")}</p>
+ </div>`;
+}
+
+async function logout(){
+ await db.auth.signOut();
+ location.reload();
+}
+
+function age(date){
+ const d=new Date(date);
+ const now=new Date();
+ let a=now.getFullYear()-d.getFullYear();
+ if(now.getMonth()<d.getMonth() ||
+   (now.getMonth()===d.getMonth()&&now.getDate()<d.getDate()))a--;
+ return a;
+}
+
+function escapeHtml(value){
+ return String(value||"")
+ .replaceAll("&","&amp;")
+ .replaceAll("<","&lt;")
+ .replaceAll(">","&gt;")
+ .replaceAll('"',"&quot;")
+ .replaceAll("'","&#039;");
+}
+
+(async()=>{
+ const {data}=await db.auth.getSession();
+
+ if(data.session){
+  user=data.session.user;
+  await startApp();
+ }
+})();
+</script>
+
+</body>
+</html>
