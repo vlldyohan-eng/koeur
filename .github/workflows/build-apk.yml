@@ -1,0 +1,59 @@
+name: Build Koeur APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Installer Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Préparer Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --version
+
+      - name: Nettoyer
+        run: |
+          ./gradlew clean --no-daemon
+
+      - name: Compiler l'APK
+        run: |
+          ./gradlew :app:assembleDebug \
+            --stacktrace \
+            --no-daemon
+
+      - name: Vérifier l'APK
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+
+          if [ ! -f "$APK" ]; then
+            echo "APK introuvable"
+            exit 1
+          fi
+
+          echo "APK créé avec succès"
+          ls -lh "$APK"
+
+      - name: Publier l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: koeur-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
