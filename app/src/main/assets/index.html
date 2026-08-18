@@ -1,11 +1,43 @@
-app/
-└── src/
-    └── main/
-        ├── AndroidManifest.xml
-        ├── assets/
-        │   └── index.html
-        ├── java/
-        │   └── com/koeur/app/MainActivity.java
-        └── res/
-            └── values/
-                └── styles.xml
+<!doctype html>
+<html lang="fr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ff3d78"><meta name="description" content="Koeur — rencontres et compatibilité intelligente">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png">
+<title>Koeur ♥</title>
+<style>
+:root{--p:#ff3d78;--ink:#18131b;--bg:#f7f6fa;--ok:#159a68;--gold:#e9a920}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--ink)}
+.app{max-width:480px;margin:auto;min-height:100vh;background:#fff}.top{padding:16px 18px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:5}.logo{font-size:29px;font-weight:900;color:var(--p)}
+main{padding:18px 18px 90px}.screen{display:none}.active{display:block}.box{padding:16px;border:1px solid #eee;border-radius:18px;margin:10px 0}.hero{padding:18px;border-radius:22px;background:linear-gradient(135deg,#211725,#654b77);color:white}.card{height:430px;border-radius:25px;background:linear-gradient(145deg,#e9b6c5,#59445e);color:white;padding:20px;display:flex;align-items:end}.name{font-size:30px;font-weight:900}.score{font-size:52px;font-weight:900}.bar{height:9px;background:#eee;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--p)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metric{background:#faf8ff;padding:12px;border-radius:14px}.cta{width:100%;padding:14px;border:0;border-radius:12px;background:var(--p);color:#fff;font-weight:800}.secondary{background:#eee;color:#222}.row{display:flex;gap:8px}.row>*{flex:1}input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 12px}.mission{display:flex;justify-content:space-between;padding:12px;border:1px solid #eee;border-radius:12px;margin:8px 0}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);background:#fff;border-top:1px solid #eee;display:flex;justify-content:space-around;padding:10px}.nav button{border:0;background:none;font-size:11px;color:#777}.nav .sel{color:var(--p);font-weight:800}.small{font-size:12px;color:#777}.verified{color:var(--ok)}
+</style></head><body><div class="app">
+<div class="top"><div class="logo">Koeur ♥</div><span id="status">Démo</span></div><main>
+<section id="home" class="screen active"><h1>Bienvenue sur Koeur ❤️</h1><p>Une application de rencontre pensée autour des affinités et des valeurs.</p>
+<div class="hero"><h2>🧠 Koeur IA</h2><p>Analyse indicative de vos affinités, expliquée simplement.</p></div>
+<div class="box"><h3>Profil démo</h3><input id="name" placeholder="Votre prénom"><input id="age" type="number" min="18" placeholder="Âge (18+)"><input id="city" placeholder="Ville"><button class="cta" onclick="start()">Entrer dans Koeur</button></div></section>
+
+<section id="discover" class="screen"><h1>Découvrir 💕</h1><div class="card"><div><div class="name">Camille, 28 ✓</div><p>📍 Dijon · Voyages · Musique · Sport</p><p>Authenticité · humour · famille</p></div></div><div class="row" style="margin:15px 0"><button class="cta secondary" onclick="alert('Profil ignoré')">✕</button><button class="cta" onclick="showAI()">🧠 Analyser</button><button class="cta" onclick="like()">❤️</button></div></section>
+
+<section id="ai" class="screen"><h1>Compatibilité IA 🧠</h1><div class="hero"><div>Compatibilité</div><div class="score">87%</div><div class="bar"><i style="width:87%"></i></div><p>🟢 Fort potentiel déclaré</p></div><div class="grid"><div class="metric"><b>94%</b><br>Valeurs</div><div class="metric"><b>91%</b><br>Communication</div><div class="metric"><b>86%</b><br>Projet de vie</div><div class="metric"><b>76%</b><br>Mode de vie</div></div><div class="box"><b>Pourquoi ?</b><p>Vos réponses présentent des attentes proches. Le rythme de vie est le principal point à discuter.</p><p class="small">Ce score est indicatif et ne garantit pas une relation.</p></div><button class="cta" onclick="like()">Créer le Koeur ❤️</button></section>
+
+<section id="elements" class="screen"><h1>⭐ Les 5 éléments</h1><div class="hero"><h2 id="element">🔥 Feu</h2><p id="xp">0 / 100 XP</p><div class="bar"><i id="xpbar" style="width:0%;background:#fff"></i></div></div><div class="mission">Compléter une mission <button onclick="mission()">+25 XP</button></div><div class="box">🔥 Feu → 💧 Eau → 🌬️ Air → 🌍 Terre → ✨ Éther</div></section>
+
+<section id="premium" class="screen"><h1>Premium 💎</h1><div class="hero"><h2>⭐ Koeur Étoile</h2><div class="score" style="font-size:38px">9,99 € <small>/an</small></div><button class="cta" onclick="premium()">Activer la démo</button></div><div class="box">⭐ Mise en avant<br>🧠 Analyse avancée<br>🔎 Filtres<br>✨ Missions Premium<br>🚫 Sans publicité</div></section>
+
+<section id="profile" class="screen"><h1>Mon profil 👤</h1><div class="box" id="profileBox">Aucun profil.</div><button class="cta secondary" onclick="resetApp()">Réinitialiser la démo</button></section>
+</main><div class="nav">
+<button onclick="tab('discover',this)">🔥<br>Découvrir</button><button onclick="tab('ai',this)">🧠<br>IA</button><button onclick="tab('elements',this)">⭐<br>Éléments</button><button onclick="tab('premium',this)">💎<br>Premium</button><button onclick="tab('profile',this)">👤<br>Profil</button>
+</div></div>
+<script>
+let me=JSON.parse(localStorage.getItem('koeur_pwa_me')||'null'),xp=+localStorage.getItem('koeur_pwa_xp')||0;
+function start(){let n=name.value.trim(),a=+age.value,c=city.value.trim();if(!n||a<18||!c){alert('Prénom, âge 18+ et ville sont requis.');return}me={n,a,c};localStorage.setItem('koeur_pwa_me',JSON.stringify(me));load()}
+function load(){if(!me)return;home.classList.remove('active');profileBox.innerHTML='<b>'+me.n+', '+me.a+'</b><p>📍 '+me.c+'</p><p class="verified">✓ Profil démo actif</p>';xpText();tab('discover',document.querySelector('.nav button'))}
+function tab(id,b){if(!me){alert('Créez votre profil.');return}document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')}
+function showAI(){tab('ai',document.querySelectorAll('.nav button')[1])}
+function like(){alert('Koeur envoyé ❤️ (mode démo)')}
+function mission(){xp=Math.min(100,xp+25);localStorage.setItem('koeur_pwa_xp',xp);xpText();if(xp===100){element.textContent='💧 Eau';alert('Élément Eau débloqué !')}}
+function xpText(){xpEl=document.getElementById('xp');xpEl.textContent=xp+' / 100 XP';document.getElementById('xpbar').style.width=xp+'%'}
+function premium(){localStorage.setItem('koeur_pwa_premium','1');alert('Premium activé en démo — aucun paiement réel.')}
+function resetApp(){localStorage.clear();location.reload()}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+if(me)load();else xpText();
+</script></body></html>
