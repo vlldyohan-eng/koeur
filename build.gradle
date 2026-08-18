@@ -3,7 +3,6 @@ plugins { id 'com.android.application' }
 android {
     namespace 'com.koeur.app'
     compileSdk 35
-
     defaultConfig {
         applicationId 'com.koeur.app'
         minSdk 23
