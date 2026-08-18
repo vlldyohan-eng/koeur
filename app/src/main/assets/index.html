@@ -1,65 +1,10 @@
-const { data, error } = await db.auth.signUp({
-    email,
-    password,
-    options: {
-        data: {
-            display_name,
-            birth_date,
-            gender,
-            looking_for,
-            relationship_status,
-            search_category,
-            city,
-            bio
-        }
-    }
-});
-
-if (error) {
-    msg.textContent = error.message;
-    return;
-}
-
-if (!data || !data.user) {
-    msg.textContent = "Supabase n'a pas créé le compte.";
-    return;
-}
-
-// IMPORTANT : si confirmation e-mail activée,
-// il n'y a pas encore de session.
-// Le trigger Supabase crée automatiquement le profil.
-if (!data.session) {
-    msg.textContent =
-        "Compte créé ✅ Vérifie ton email puis reconnecte-toi.";
-    return;
-}
-
-// Seulement lorsqu'une session existe,
-// on peut modifier profiles depuis le navigateur.
-const { error: profileError } = await db
-    .from("profiles")
-    .upsert({
-        id: data.user.id,
-        display_name,
-        birth_date,
-        gender,
-        looking_for,
-        relationship_status,
-        search_category,
-        city,
-        bio,
-        updated_at: new Date().toISOString()
-    });
-
-if (profileError) {
-    msg.textContent = profileError.message;
-    return;
-}
-
-msg.textContent = "Compte créé ✅";
-
-
-<style>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ff3d78">
+<title>Koeur ♥</title>
 <style>
 *{box-sizing:border-box}
 body{
@@ -1560,137 +1505,124 @@ function age(date){
 
 async function signup(){
 
-    if(!supabaseReady()){
-        showError("Connexion au serveur indisponible.");
-        return;
-    }
+    const authMsg = document.getElementById("authMsg");
 
-    const birthInput =
-        document.getElementById("birthDate");
-
-    const birth_date =
-        birthInput ? birthInput.value : "";
-
-    if(!isAdult(birth_date)){
-
-        const ageError =
-            document.getElementById("ageError");
-
-        if(ageError){
-            ageError.textContent =
-                "Koeur est réservé aux personnes âgées de 18 ans ou plus.";
+    try {
+        if(!supabaseReady()){
+            authMsg.textContent = "Connexion au serveur indisponible.";
+            return;
         }
 
-        return;
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const display_name = document.getElementById("firstName").value.trim();
+        const birth_date = document.getElementById("birthDate").value;
+        const gender = document.getElementById("gender").value;
+        const looking_for = document.getElementById("lookingFor").value;
+        const relationship_status = document.getElementById("relationshipStatus").value;
+        const search_category = document.getElementById("searchCategory").value;
+        const city = document.getElementById("city").value.trim();
+        const bio = document.getElementById("bio").value.trim();
+
+        const ageError = document.getElementById("ageError");
+        if(ageError) ageError.textContent = "";
+
+        if(!email || !password || !display_name || !birth_date){
+            authMsg.textContent = "Remplis les champs obligatoires.";
+            return;
+        }
+
+        if(password.length < 6){
+            authMsg.textContent = "Le mot de passe doit contenir au moins 6 caractères.";
+            return;
+        }
+
+        if(!isAdult(birth_date)){
+            if(ageError){
+                ageError.textContent =
+                    "Koeur est réservé aux personnes âgées de 18 ans ou plus.";
+            }
+            return;
+        }
+
+        authMsg.textContent = "Création du compte...";
+
+        const { data, error } = await db.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    display_name,
+                    birth_date,
+                    gender,
+                    looking_for,
+                    relationship_status,
+                    search_category,
+                    city,
+                    bio
+                }
+            }
+        });
+
+        if(error){
+            console.error("Erreur inscription:", error);
+            authMsg.textContent = error.message;
+            return;
+        }
+
+        if(!data || !data.user){
+            authMsg.textContent = "Supabase n'a pas créé le compte.";
+            return;
+        }
+
+        /*
+         * Si la confirmation e-mail est activée, Supabase peut
+         * retourner un utilisateur sans session.
+         * Dans ce cas, le trigger PostgreSQL crée le profil.
+         */
+        if(!data.session){
+            authMsg.textContent =
+                "Compte créé ✅ Vérifie ton email puis reconnecte-toi.";
+            return;
+        }
+
+        /*
+         * Si une session est disponible immédiatement,
+         * on crée/met à jour le profil.
+         */
+        const { error: profileError } = await db
+            .from("profiles")
+            .upsert({
+                id: data.user.id,
+                display_name,
+                birth_date,
+                gender,
+                looking_for,
+                relationship_status,
+                search_category,
+                city,
+                bio,
+                updated_at: new Date().toISOString()
+            });
+
+        if(profileError){
+            console.error("Erreur profil:", profileError);
+            authMsg.textContent =
+                "Compte créé, mais profil non enregistré : " +
+                profileError.message;
+            return;
+        }
+
+        user = data.user;
+        authMsg.textContent = "Compte créé avec succès ✅";
+        await startApp();
+        await checkDeveloperAccess();
+
+    } catch(error) {
+        console.error("Erreur inattendue lors de l'inscription:", error);
+        authMsg.textContent =
+            "Une erreur est survenue pendant la création du compte.";
     }
-
-
-
- const email =
-  document.getElementById("email")
-  .value.trim();
-
- const password =
-  document.getElementById("password")
-  .value;
-
- const display_name =
-  document.getElementById("firstName")
-  .value.trim();
-
- document.getElementById("ageError").textContent = "";
-
- const gender =
-  document.getElementById("gender").value;
-
- const looking_for =
-  document.getElementById("lookingFor").value;
-
- const relationship_status =
-  document.getElementById("relationshipStatus").value;
-
- const search_category =
-  document.getElementById("searchCategory").value;
-
- const city =
-  document.getElementById("city")
-  .value.trim();
-
- const bio =
-  document.getElementById("bio")
-  .value.trim();
-
- if(
-  !email ||
-  !password ||
-  !display_name ||
-  !birth_date
- ){
-
-  authMsg.textContent =
-   "Remplis les champs obligatoires.";
-
-  return;
- }
-
- const {
-  data,
-  error
- } =
- await db.auth.signUp({
-
-  email,
-  password,
-
-  options:{
-   data:{
-    display_name,
-    birth_date
-   }
-  }
-
- });
-
- if(error){
-
-  authMsg.textContent =
-   error.message;
-
-  return;
- }
-
- if(data.user){
-
-  const {
-   error:profileError
-  } =
-  await db
-   .from("profiles")
-   .upsert({
-
-    id:data.user.id,
-    display_name,
-    birth_date,
-    gender,
-    looking_for,
-    relationship_status,
-    search_category,
-    city,
-    bio
-
-   });
-
-  if(profileError){
-
-   authMsg.textContent =
-    profileError.message;
-
-   return;
-  }
- }
-
- authMsg.textContent =
-  "Compte créé. Vérifie ton email si nécessaire.";
 }
 
 /* ================= CONNEXION ================= */
@@ -3674,219 +3606,6 @@ function loadDailyRoseSymbol(){
     `;
 }
 
-async function signup(){
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-    const display_name = document.getElementById("firstName").value.trim();
-    const birth_date = document.getElementById("birthDate").value;
-    const gender = document.getElementById("gender").value;
-    const looking_for = document.getElementById("lookingFor").value;
-    const relationship_status = document.getElementById("relationshipStatus").value;
-    const search_category = document.getElementById("searchCategory").value;
-    const city = document.getElementById("city").value.trim();
-    const bio = document.getElementById("bio").value.trim();
-    const msg = document.getElementById("authMsg");
-
-    if(!email || !password || !display_name || !birth_date){
-        msg.textContent = "Remplis tous les champs obligatoires.";
-        return;
-    }
-
-    if(!isAdult(birth_date)){
-        msg.textContent = "Koeur est réservé aux personnes de 18 ans ou plus.";
-        return;
-    }
-
-    msg.textContent = "Création du compte...";
-
-    const { data, error } = await db.auth.signUp({
-        email,
-        password,
-        options:{
-            data:{
-                display_name,
-                birth_date
-            }
-        }
-    });
-
-    if(error){
-        msg.textContent = error.message;
-        return;
-    }
-
-    if(!data.user){
-        msg.textContent = "Compte non créé.";
-        return;
-    }
-
-    const { error:profileError } = await db
-        .from("profiles")
-        .upsert({
-            id:data.user.id,
-            display_name,
-            birth_date,
-            gender,
-            looking_for,
-            relationship_status,
-            search_category,
-            city,
-            bio
-        });
-
-    if(profileError){
-        console.error(profileError);
-        msg.textContent = profileError.message;
-        return;
-    }
-
-    msg.textContent = "Compte créé ✅ Vérifie ton email si nécessaire.";
-}
-
-async function updateProfile(){
-    if(!user){
-        alert("Session expirée.");
-        return;
-    }
-
-    const gender = document.getElementById("editGender").value;
-    const looking_for = document.getElementById("editLookingFor").value;
-    const relationship_status = document.getElementById("editRelationshipStatus").value;
-    const search_category = document.getElementById("editSearchCategory").value;
-    const city = document.getElementById("editCity").value.trim();
-    const bio = document.getElementById("editBio").value.trim();
-
-    const { error } = await db
-        .from("profiles")
-        .update({
-            gender,
-            looking_for,
-            relationship_status,
-            search_category,
-            city,
-            bio,
-            updated_at: new Date().toISOString()
-        })
-        .eq("id", user.id);
-
-    if(error){
-        console.error(error);
-        alert("Erreur : " + error.message);
-        return;
-    }
-
-    alert("Profil enregistré ✅");
-    await loadProfile();
-    await loadProfiles();
-}
-
-async function sendMessage(){
-    if(!selectedMatch){
-        return;
-    }
-
-    const input = document.getElementById("messageInput");
-    const body = input.value.trim();
-
-    if(!body){
-        return;
-    }
-
-    const { error } = await db
-        .from("messages")
-        .insert({
-            match_id: selectedMatch,
-            sender_id: user.id,
-            body
-        });
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    input.value = "";
-    await loadMessages();
-}
-
-async function loadMessages(){
-    if(!selectedMatch){
-        messagesList.innerHTML = "<p>Sélectionne un match.</p>";
-        return;
-    }
-
-    const { data, error } = await db
-        .from("messages")
-        .select("*")
-        .eq("match_id", selectedMatch)
-        .order("created_at", { ascending: true });
-
-    if(error){
-        messagesList.textContent = error.message;
-        return;
-    }
-
-    messagesList.innerHTML = (data || [])
-        .map(message => `
-            <div class="message ${message.sender_id === user.id ? "mine" : ""}">
-                <b>${message.sender_id === user.id ? "Moi" : "Match"}</b>
-                <p>${escapeHtml(message.body)}</p>
-            </div>
-        `)
-        .join("");
-}
-
-async function uploadPhoto(){
-    const input = document.getElementById("photoFile");
-    const file = input.files[0];
-
-    if(!file){
-        alert("Choisis une photo.");
-        return;
-    }
-
-    const allowed = ["image/jpeg", "image/png", "image/webp"];
-    if(!allowed.includes(file.type)){
-        alert("JPG, PNG ou WebP uniquement.");
-        return;
-    }
-
-    if(file.size > 5 * 1024 * 1024){
-        alert("Photo limitée à 5 Mo.");
-        return;
-    }
-
-    const extension = file.name.split(".").pop().toLowerCase();
-    const path = user.id + "/" + crypto.randomUUID() + "." + extension;
-
-    const { error:uploadError } = await db.storage
-        .from("profile-photos")
-        .upload(path, file, { contentType: file.type, upsert:false });
-
-    if(uploadError){
-        alert(uploadError.message);
-        return;
-    }
-
-    const { data:urlData } = db.storage.from("profile-photos").getPublicUrl(path);
-    const { error } = await db
-        .from("profile_photos")
-        .insert({
-            user_id:user.id,
-            photo_url:urlData.publicUrl,
-            position:0
-        });
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    input.value = "";
-    alert("Photo ajoutée ✅");
-    await loadProfile();
-}
-
 window.addEventListener("error", event => {
     console.error("[KOEUR]", event.error || event.message);
 });
@@ -3895,6 +3614,9 @@ window.addEventListener("unhandledrejection", event => {
     console.error("[KOEUR PROMISE]", event.reason);
 });
 
+</script>
+</body>
+</html>
 </script>
 
 </body>
