@@ -1,13 +1,136 @@
-<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Koeur</title><style>
-body{margin:0;font-family:Arial;background:#f7f6fa;color:#18131b}.a{max-width:480px;margin:auto;background:#fff;min-height:100vh;padding-bottom:30px}
-h1{font-size:26px}.top{padding:18px;color:#ff3d78;font-size:30px;font-weight:900}.p{padding:18px}.card{height:420px;border-radius:25px;padding:20px;display:flex;align-items:end;color:white;background:linear-gradient(145deg,#e9b6c5,#59445e);box-shadow:0 10px 25px #0002}.name{font-size:30px;font-weight:900}.hero{padding:18px;border-radius:20px;background:linear-gradient(135deg,#211725,#654b77);color:white;margin:14px 0}.score{font-size:50px;font-weight:900}.btn{width:100%;padding:14px;border:0;border-radius:12px;background:#ff3d78;color:white;font-weight:800;margin:7px 0}.box{padding:15px;border:1px solid #eee;border-radius:17px;margin:10px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.m{padding:12px;background:#faf8ff;border-radius:12px}.nav{display:flex;gap:5px;flex-wrap:wrap}.nav button{flex:1;min-width:28%;border:0;background:#eee;border-radius:10px;padding:10px}.screen{display:none}.on{display:block}
-</style><div class="a"><div class="top">Koeur ♥</div><div class="p">
-<section id="d" class="screen on"><h1>Des rencontres qui ont du sens.</h1><div class="card"><div><div class="name">Camille, 28 ✓</div><p>📍 Dijon · Voyages · Musique · Sport</p><p>Authenticité · humour · famille</p></div></div><button class="btn" onclick="ai()">🧠 Analyser la compatibilité</button><button class="btn" onclick="alert('Koeur envoyé ❤️')">❤️ Créer le Koeur</button></section>
-<section id="i" class="screen"><h1>Compatibilité IA 🧠</h1><div class="hero"><div>Score global</div><div class="score">87%</div><p>🟢 Fort potentiel déclaré</p></div><div class="grid"><div class="m"><b>94%</b><br>Valeurs</div><div class="m"><b>91%</b><br>Communication</div><div class="m"><b>86%</b><br>Projet de vie</div><div class="m"><b>76%</b><br>Mode de vie</div></div><div class="box"><b>Pourquoi ?</b><p>Vos attentes déclarées sont proches. Le rythme de vie est le principal point à discuter.</p><small>Score indicatif, sans garantie de réussite.</small></div></section>
-<section id="e" class="screen"><h1>⭐ 5 éléments</h1><div class="hero"><h2>🔥 Feu</h2><p id="xp">0 / 100 XP</p></div><button class="btn" onclick="mission()">🎯 Faire une mission +25 XP</button><div class="box">🔥 Feu → 💧 Eau → 🌬️ Air → 🌍 Terre → ✨ Éther</div></section>
-<section id="pr" class="screen"><h1>Premium 💎</h1><div class="hero"><h2>⭐ Koeur Étoile</h2><div class="score">9,99€</div><p>par an</p></div><button class="btn" onclick="alert('Mode démonstration : aucun paiement réel.')">Activer Premium</button></section>
-<div class="nav"><button onclick="show('d')">🔥 Découvrir</button><button onclick="show('i')">🧠 IA</button><button onclick="show('e')">⭐ Éléments</button><button onclick="show('pr')">💎 Premium</button></div>
-</div></div><script>
-let x=+localStorage.getItem('xp')||0;xp.textContent=x+' / 100 XP';function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');scrollTo(0,0)}function ai(){show('i')}function mission(){x=Math.min(100,x+25);localStorage.setItem('xp',x);document.getElementById('xp').textContent=x+' / 100 XP';if(x==100)alert('💧 Eau débloqué !')}
-</script>
+<!doctype html>
+<html lang="fr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Koeur</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f4f7;font-family:Arial,sans-serif;color:#211a21}
+.app{max-width:540px;margin:auto;background:#fff;min-height:100vh}.top{padding:17px 20px;font-size:28px;font-weight:900;color:#e91e63;position:sticky;top:0;background:#fff;z-index:3}
+.pad{padding:18px}.screen{display:none}.active{display:block}.card{padding:16px;border-radius:20px;background:#fff;box-shadow:0 5px 20px #0001;margin:10px 0}
+.btn{width:100%;border:0;border-radius:12px;padding:13px;margin:6px 0;background:#e91e63;color:#fff;font-weight:800}.secondary{background:#eee;color:#222}
+input,textarea,select{width:100%;padding:12px;margin:5px 0;border:1px solid #ddd;border-radius:11px;font-size:15px}.muted{color:#777}.err{color:#b00020}.ok{color:#137333}
+.nav{position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;display:flex;z-index:4}.nav button{flex:1;border:0;background:#fff;padding:12px 2px;font-size:11px}
+.pill{display:inline-block;padding:5px 9px;border-radius:20px;background:#fbe4ed;margin:3px}.score{font-size:44px;font-weight:900;color:#e91e63}
+.msglist{height:55vh;overflow:auto;padding:8px;background:#faf8fa;border-radius:16px}.bubble{max-width:78%;padding:10px 12px;border-radius:15px;margin:6px 0;clear:both}.mine{float:right;background:#e91e63;color:#fff;border-bottom-right-radius:4px}.theirs{float:left;background:#eee;border-bottom-left-radius:4px}.row{display:flex;gap:7px}.row input{flex:1}.row button{width:65px;margin:5px 0}.avatar{width:55px;height:55px;border-radius:50%;background:#fbe4ed;display:inline-flex;align-items:center;justify-content:center;font-size:25px}
+</style></head><body><div class="app">
+<div class="top">Koeur ♥</div><div class="pad">
+
+<section id="auth" class="screen active">
+<h2>Bienvenue sur Koeur</h2><p class="muted">Rencontres, affinités et échanges respectueux.</p>
+<input id="email" type="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Mot de passe (6 caractères minimum)">
+<button class="btn" onclick="signup()">Créer mon compte</button>
+<button class="btn secondary" onclick="login()">Se connecter</button><div id="authmsg"></div>
+</section>
+
+<section id="discover" class="screen"><h2>Découvrir ❤️</h2><div id="profiles"></div></section>
+
+<section id="matches" class="screen"><h2>Mes matchs 💞</h2><div id="matchList"></div></section>
+
+<section id="chat" class="screen">
+<button class="btn secondary" onclick="show('matches')">← Mes matchs</button>
+<h2 id="chatTitle">Discussion</h2><div id="messages" class="msglist"></div>
+<div class="row"><input id="messageInput" maxlength="2000" placeholder="Écrire un message…"><button class="btn" onclick="sendMessage()">➤</button></div>
+</section>
+
+<section id="compat" class="screen"><h2>🧠 Compatibilité Koeur</h2>
+<div class="card"><div class="score" id="score">—</div><p id="explain">Sélectionne un profil.</p></div></section>
+
+<section id="safety" class="screen"><h2>🛡️ Sécurité</h2>
+<div class="card"><p>Les signalements sont enregistrés pour la modération.</p>
+<input id="reportUser" placeholder="ID du profil à signaler">
+<textarea id="reportReason" placeholder="Motif du signalement"></textarea>
+<button class="btn" onclick="reportUser()">⚑ Signaler</button>
+<button class="btn secondary" onclick="blockUser()">🚫 Bloquer</button>
+<div id="safetyMsg"></div></div></section>
+
+<section id="missions" class="screen"><h2>⭐ Éléments & missions</h2>
+<div class="card"><h3 id="elementTitle">🔥 Feu</h3><p>XP : <b id="xp">0</b>/100</p>
+<button class="btn" onclick="addXp()">🎯 Mission +25 XP</button></div>
+<div class="card"><b>Progression</b><p>🔥 Feu → 💧 Eau → 🌬️ Air → 🌍 Terre → ✨ Éther</p></div></section>
+
+<section id="profile" class="screen"><h2>👤 Mon profil</h2>
+<div class="card"><b>📸 Photo de profil</b><input id="photoFile" type="file" accept="image/*" onchange="uploadPhoto()"><div id="photoMsg"></div><img id="photoPreview" style="display:none;max-width:100%;border-radius:18px;margin-top:8px"></div>
+<input id="name" placeholder="Prénom / pseudo"><input id="city" placeholder="Ville"><input id="birth" type="date">
+<textarea id="bio" placeholder="Ta présentation"></textarea>
+<select id="element"><option value="feu">🔥 Feu</option><option value="eau">💧 Eau</option><option value="air">🌬️ Air</option><option value="terre">🌍 Terre</option><option value="ether">✨ Éther</option></select>
+<button class="btn" onclick="saveProfile()">Enregistrer</button><div id="profilemsg"></div>
+<div class="card"><b>🛡️ Sécurité</b><p class="muted">Tu peux bloquer ou signaler un profil depuis sa fiche.</p></div>
+<div class="card"><b>✓ Certification</b><p class="muted">Demande de vérification à traiter par la modération.</p><button class="btn secondary" onclick="requestVerification()">Demander la certification</button></div>
+<div class="card"><b>💎 Premium</b><p>9,99 € / an</p><button class="btn" onclick="alert('Le paiement réel doit être configuré avec Google Play Billing avant publication.')">Voir Premium</button></div>
+<button class="btn secondary" onclick="logout()">Se déconnecter</button>
+</section>
+
+</div>
+<div id="nav" class="nav" style="display:none">
+<button onclick="show('discover')">❤️<br>Découvrir</button><button onclick="show('matches')">💞<br>Matchs</button><button onclick="show('compat')">🧠<br>IA</button><button onclick="show('missions')">⭐<br>Éléments</button><button onclick="show('profile')">👤<br>Profil</button><button onclick="show('safety')">🛡️<br>Sécurité</button>
+</div></div>
+
+<script>
+const URL="https://sttmiacttpkvzunlggog.supabase.co";
+const KEY="sb_publishable_RKRc0ZugsLnIyFpuKz1org_Y0gxBNwq";
+const sb=window.supabase.createClient(URL,KEY);
+let me=null,currentMatch=null,currentOther=null,realtime=null;
+
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='discover')loadProfiles();if(id==='matches')loadMatches();}
+function msg(id,t,ok=false){document.getElementById(id).innerHTML='<p class="'+(ok?'ok':'err')+'">'+t+'</p>'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function el(e){return {feu:'🔥 Feu',eau:'💧 Eau',air:'🌬️ Air',terre:'🌍 Terre',ether:'✨ Éther'}[e]||''}
+
+async function signup(){const email=document.getElementById('email').value.trim(),password=document.getElementById('pass').value;if(!email||password.length<6)return msg('authmsg','Email ou mot de passe invalide.');const {data,error}=await sb.auth.signUp({email,password});if(error)return msg('authmsg',error.message);me=data.user;if(me){await ensureProfile();msg('authmsg','Compte créé ✓',true);show('profile');}}
+async function login(){const email=document.getElementById('email').value.trim(),password=document.getElementById('pass').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return msg('authmsg',error.message);me=data.user;await loadMyProfile();document.getElementById('nav').style.display='flex';show('discover');}
+async function logout(){if(realtime)sb.removeChannel(realtime);await sb.auth.signOut();me=null;document.getElementById('nav').style.display='none';show('auth');}
+async function ensureProfile(){const {data}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();if(!data){await sb.from('profiles').insert({id:me.id,display_name:'Nouveau membre'});}await loadMyProfile();}
+async function loadMyProfile(){const {data,error}=await sb.from('profiles').select('*').eq('id',me.id).single();if(error)return msg('profilemsg',error.message);name.value=data.display_name||'';city.value=data.city||'';birth.value=data.birth_date||'';bio.value=data.bio||'';element.value=data.element||'feu';xp.textContent=data.xp||0;elementTitle.textContent=el(data.element);}
+async function saveProfile(){const p={id:me.id,display_name:name.value.trim()||'Membre Koeur',city:city.value.trim(),birth_date:birth.value||null,bio:bio.value.trim(),element:element.value,updated_at:new Date().toISOString()};const {error}=await sb.from('profiles').upsert(p);if(error)msg('profilemsg',error.message);else msg('profilemsg','Profil enregistré ✓',true);}
+async function loadProfiles(){const {data,error}=await sb.from('profiles').select('id,display_name,city,bio,verified,element').neq('id',me.id).limit(30);if(error){profiles.innerHTML='<p class="err">'+esc(error.message)+'</p>';return}if(!data.length){profiles.innerHTML='<div class="card">Aucun autre profil pour le moment.</div>';return}profiles.innerHTML=data.map(p=>`<div class="card"><div class="row"><div class="avatar">${esc((p.display_name||'?')[0])}</div><div><h3>${esc(p.display_name)} ${p.verified?'✓':''}</h3><p>${esc(p.city||'')}</p></div></div><p>${esc(p.bio||'')}</p><span class="pill">${el(p.element)}</span><button class="btn" onclick="like('${p.id}')">❤️ Koeur</button><button class="btn secondary" onclick='showCompatibility(${JSON.stringify(p)})'>🧠 Compatibilité</button></div>`).join('');}
+async function like(id){const {error}=await sb.from('likes').insert({from_user:me.id,to_user:id});if(error&&!String(error.message).includes('duplicate'))return alert(error.message);alert('Koeur envoyé ❤️');loadMatches();}
+async function loadMatches(){const {data,error}=await sb.from('matches').select('*').or(`user_a.eq.${me.id},user_b.eq.${me.id}`);if(error){matchList.innerHTML='<p class="err">'+esc(error.message)+'</p>';return}if(!data?.length){matchList.innerHTML='<div class="card">Pas encore de match. Quand un Koeur est réciproque, la discussion apparaît ici.</div>';return}let ids=data.map(m=>m.user_a===me.id?m.user_b:m.user_a);const {data:ps}=await sb.from('profiles').select('id,display_name,city,verified').in('id',ids);matchList.innerHTML=(ps||[]).map(p=>`<div class="card"><div class="row"><div class="avatar">${esc((p.display_name||'?')[0])}</div><div><b>${esc(p.display_name)} ${p.verified?'✓':''}</b><p class="muted">${esc(p.city||'')}</p></div></div><button class="btn" onclick="openChat('${p.id}','${esc(p.display_name)}')">💬 Ouvrir la discussion</button></div>`).join('');}
+async function openChat(otherId,title){currentOther=otherId;chatTitle.textContent='💬 '+title;const a=me.id<otherId?me.id:otherId,b=me.id<otherId?otherId:me.id;const {data,error}=await sb.from('matches').select('id').eq('user_a',a).eq('user_b',b).single();if(error)return alert('Match introuvable.');currentMatch=data;show('chat');await loadMessages();if(realtime)sb.removeChannel(realtime);realtime=sb.channel('chat-'+data.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'match_id=eq.'+data.id},payload=>renderMessage(payload.new)).subscribe();}
+async function loadMessages(){const {data,error}=await sb.from('messages').select('*').eq('match_id',currentMatch.id).order('created_at',{ascending:true});if(error)return;messages.innerHTML='';(data||[]).forEach(renderMessage);messages.scrollTop=messages.scrollHeight;}
+function renderMessage(m){const div=document.createElement('div');div.className='bubble '+(m.sender_id===me.id?'mine':'theirs');div.textContent=m.body;messages.appendChild(div);messages.scrollTop=messages.scrollHeight;}
+async function sendMessage(){const body=messageInput.value.trim();if(!body||!currentMatch)return;const {error}=await sb.from('messages').insert({match_id:currentMatch.id,sender_id:me.id,body});if(error)alert(error.message);else messageInput.value='';}
+async function requestVerification(){const {error}=await sb.from('verifications').insert({user_id:me.id,provider:'manual',status:'pending'});alert(error?'Erreur: '+error.message:'Demande envoyée ✓');}
+
+async function uploadPhoto(){
+ const f=photoFile.files[0]; if(!f||!me)return;
+ if(f.size>5*1024*1024){return msg('photoMsg','Photo trop volumineuse (5 Mo max).');}
+ const ext=(f.name.split('.').pop()||'jpg').toLowerCase();
+ const path=me.id+'/'+crypto.randomUUID()+'.'+ext;
+ const {error}=await sb.storage.from('profile-photos').upload(path,f,{upsert:false,contentType:f.type});
+ if(error)return msg('photoMsg',error.message);
+ const {data}=sb.storage.from('profile-photos').getPublicUrl(path);
+ photoPreview.src=data.publicUrl;photoPreview.style.display='block';
+ await sb.from('photos').insert({user_id:me.id,storage_path:path,is_primary:true});
+ msg('photoMsg','Photo ajoutée ✓',true);
+}
+async function reportUser(){
+ const id=reportUserEl(); const reason=document.getElementById('reportReason').value.trim();
+ if(!id||!reason)return msg('safetyMsg','Indique un profil et un motif.');
+ const {error}=await sb.from('reports').insert({reporter_id:me.id,reported_user_id:id,reason});
+ if(error)return msg('safetyMsg',error.message); msg('safetyMsg','Signalement envoyé ✓',true);
+}
+async function blockUser(){
+ const id=reportUserEl(); if(!id)return msg('safetyMsg','Indique l’ID du profil.');
+ const {error}=await sb.from('blocks').insert({blocker_id:me.id,blocked_user_id:id});
+ if(error)return msg('safetyMsg',error.message); msg('safetyMsg','Profil bloqué ✓',true);
+}
+function reportUserEl(){return document.getElementById('reportUser').value.trim()}
+async function showCompatibility(p){
+ let score=50, reasons=[];
+ const mine=await sb.from('profiles').select('element,city,bio').eq('id',me.id).single();
+ if(mine.data){
+   if(mine.data.element && p.element===mine.data.element){score+=20;reasons.push('même élément');}
+   if(mine.data.city && p.city && mine.data.city.toLowerCase()===p.city.toLowerCase()){score+=15;reasons.push('même ville');}
+   const a=new Set((mine.data.bio||'').toLowerCase().split(/\\W+/).filter(x=>x.length>4));
+   const b=new Set((p.bio||'').toLowerCase().split(/\\W+/).filter(x=>x.length>4));
+   let common=0; for(const w of a) if(b.has(w)) common++;
+   if(common) {score+=Math.min(15,common*3); reasons.push(common+' centre(s) d’intérêt textuel(s) commun(s)');}
+ }
+ score=Math.min(100,score);document.getElementById('score').textContent=score+'%';
+ document.getElementById('explain').textContent=reasons.length?reasons.join(' · '):'Score indicatif basé sur les informations publiques du profil.';
+ show('compat');
+}
+async function addXp(){const {data}=await sb.from('profiles').select('xp').eq('id',me.id).single();let n=Math.min(100,(data?.xp||0)+25);await sb.from('profiles').update({xp:n}).eq('id',me.id);xp.textContent=n;}
+(async()=>{const {data}=await sb.auth.getSession();if(data.session){me=data.session.user;await loadMyProfile();document.getElementById('nav').style.display='flex';show('discover');}})();
+</script></body></html>

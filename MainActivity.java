@@ -7,15 +7,15 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
-    @Override protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        WebView web = new WebView(this);
-        web.setWebViewClient(new WebViewClient());
-        WebSettings s = web.getSettings();
+    @Override public void onCreate(Bundle b) {
+        super.onCreate(b);
+        WebView w = new WebView(this);
+        w.setWebViewClient(new WebViewClient());
+        WebSettings s = w.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
-        s.setAllowFileAccess(true);
-        web.loadUrl("file:///android_asset/index.html");
-        setContentView(web);
+        s.setDatabaseEnabled(true);
+        w.loadUrl("file:///android_asset/index.html");
+        setContentView(w);
     }
 }

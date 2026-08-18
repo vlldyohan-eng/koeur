@@ -1,11 +1,7 @@
-# Koeur Android
+# Koeur Android — vrais comptes/profils
 
-Projet Android prêt à être compilé automatiquement par GitHub Actions.
+Cette version utilise Supabase Auth et PostgreSQL directement depuis l'application.
+Fonctions actuellement branchées : création de compte, connexion, profil, découverte de profils, Koeur (like), XP/éléments.
 
-## Générer l'APK
-1. Mettre ce projet dans le dépôt GitHub `koeur`.
-2. Aller dans **Actions**.
-3. Lancer **Build Koeur APK** avec **Run workflow**.
-4. Une fois terminé, ouvrir le workflow puis **Artifacts** et télécharger `koeur-debug-apk`.
-
-L'APK est un build de démonstration signé avec la clé debug. Pour Google Play, il faudra créer une clé de signature de production et un Android App Bundle (.aab), puis configurer la fiche Play Console.
+Avant utilisation : exécuter le SQL `001_koeur.sql` du backend Koeur V2 dans Supabase. Activer l'inscription Email. Ne jamais mettre une clé `service_role`/secret dans l'application.
+Le moteur de compatibilité avancé, la messagerie temps réel, les photos Storage, la vérification d'identité et Google Play Billing restent à brancher pour une version production.
