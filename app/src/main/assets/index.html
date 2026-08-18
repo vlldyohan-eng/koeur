@@ -1,30 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ff3d78">
-<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Koeur ♥</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-window.addEventListener(
-    "error",
-    function(event){
-        console.error("Koeur JavaScript:", event.error || event.message);
-    }
-);
-window.addEventListener(
-    "unhandledrejection",
-    function(event){
-        console.error("Koeur Promise:", event.reason);
-    }
-);
-</script>
-
-
 <style>
 *{box-sizing:border-box}
+body{
+ margin:0;
+ background:#f7f6fa;
+ color:#18131b;
+ font-family:Arial,sans-serif
+}*{box-sizing:border-box}
 body{
  margin:0;
  background:#f7f6fa;
@@ -123,6 +112,40 @@ button{
  background:#ffe0ea;
  text-align:right
 }
+
+/* ===== KOEUR - INSCRIPTION MODERNE ===== */
+.auth-screen{min-height:calc(100vh - 70px);padding:18px 0 30px;background:radial-gradient(circle at top right,#ffe1eb 0%,transparent 42%),linear-gradient(180deg,#fff8fb,#fff)}
+.auth-container{max-width:460px;margin:auto}
+.auth-logo{text-align:center;margin:5px 0 15px}
+.heart-logo{width:64px;height:64px;margin:auto;border-radius:21px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ff3d78,#ff7198);color:#fff;font-size:34px;box-shadow:0 10px 26px rgba(255,61,120,.22)}
+.brand-name{margin-top:7px;font-size:27px;font-weight:900;color:#ff3d78}
+.auth-progress{height:7px;background:#eee7ea;border-radius:20px;overflow:hidden;margin:8px 0 5px}
+.auth-progress-bar{height:100%;width:25%;background:linear-gradient(90deg,#ff3d78,#ff7198);transition:width .25s}
+.auth-step-counter{text-align:right;color:#888;font-size:12px;margin-bottom:10px}
+.auth-step{display:none;animation:authFade .2s ease}.auth-step.active{display:block}
+@keyframes authFade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.auth-step h1{margin:18px 0 7px;font-size:27px;line-height:1.18}
+.auth-subtitle{margin:0 0 18px;color:#777;line-height:1.5;font-size:14px}
+.welcome-card{padding:22px;border-radius:22px;background:#fff;border:1px solid #f0e3e8;box-shadow:0 10px 28px rgba(35,20,28,.06);text-align:center;margin-bottom:16px}
+.welcome-icon{font-size:46px}.welcome-card h2{font-size:19px;margin:7px 0}.welcome-card p{color:#777;line-height:1.5;margin:0}
+.auth-label{display:block;margin:14px 0 6px;font-size:13px;font-weight:800}
+.auth-input-wrapper{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e4dde1;border-radius:15px;padding:0 13px}
+.auth-input-wrapper:focus-within{border-color:#ff3d78;box-shadow:0 0 0 4px rgba(255,61,120,.09)}
+.auth-input-wrapper input{border:0!important;outline:0!important;box-shadow:none!important;margin:0!important;padding:14px 0!important;background:transparent}
+.choice-grid,.relation-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.choice-button,.relation-button{border:1px solid #e4dde1;background:#fff;color:#34292f;border-radius:16px;padding:14px 9px;display:flex;align-items:center;justify-content:center;gap:7px;min-height:58px;cursor:pointer;margin:0}
+.choice-button.selected,.relation-button.selected{background:#fff0f4;border-color:#ff3d78;color:#d92d61}
+.relation-button{flex-direction:column;min-height:78px;font-size:13px;font-weight:700}
+.auth-navigation{display:flex;gap:9px;margin-top:18px}
+.back-button{width:35%;background:#f1edef;color:#44383e;border:0;border-radius:15px;font-weight:800;margin:0;cursor:pointer}
+.next-button,.create-account-button,.auth-main-button{flex:1;border:0;border-radius:15px;min-height:52px;background:linear-gradient(135deg,#ff3d78,#ff6590);color:#fff;font-weight:800;font-size:14px;box-shadow:0 8px 20px rgba(255,61,120,.2);cursor:pointer;margin:0}
+.auth-link-button{background:transparent;border:0;color:#ff3d78;font-weight:800;cursor:pointer;margin-top:5px}
+.auth-textarea{width:100%;min-height:110px;padding:14px;border:1px solid #e4dde1;border-radius:15px;resize:vertical;outline:0;font-family:inherit}
+.auth-message{text-align:center;min-height:20px;margin-top:10px;font-size:13px;font-weight:700}
+.auth-error{min-height:17px;color:#d92855;font-size:12px;font-weight:700;margin:5px 0}
+.bio-counter{text-align:right;color:#999;font-size:11px;margin-top:4px}
+@media(max-width:380px){.choice-grid,.relation-grid{grid-template-columns:1fr}.auth-step h1{font-size:24px}}
+
 </style>
 </head>
 
@@ -136,63 +159,81 @@ button{
 
 <!-- ================= AUTH ================= -->
 
-<section id="auth" class="active">
+<section id="auth" class="active auth-screen">
+<div class="auth-container">
+<div class="auth-logo"><div class="heart-logo">♥</div><div class="brand-name">Koeur</div></div>
+<div class="auth-progress"><div id="authProgressBar" class="auth-progress-bar"></div></div>
+<div class="auth-step-counter">Étape <span id="authStepNumber">1</span> sur 4</div>
 
-<div class="logo">♥</div>
+<div class="auth-step active" id="authStep1">
+<h1>Bienvenue sur Koeur 💕</h1>
+<p class="auth-subtitle">Créons ton profil en quelques étapes simples.</p>
+<div class="welcome-card"><div class="welcome-icon">💖</div><h2>Des rencontres qui ont du sens</h2><p>Découvre des personnes selon tes valeurs, tes attentes et tes affinités.</p></div>
+<button type="button" class="auth-main-button" onclick="nextAuthStep()">Commencer →</button>
+<button type="button" class="auth-link-button" onclick="login()">J'ai déjà un compte</button>
+</div>
 
-<h1>Bienvenue sur Koeur</h1>
+<div class="auth-step" id="authStep2">
+<h1>Faisons connaissance 👋</h1>
+<p class="auth-subtitle">Ces informations permettent de construire ton profil.</p>
+<label class="auth-label">Ton prénom</label>
+<div class="auth-input-wrapper"><span>👤</span><input id="firstName" type="text" placeholder="Ex. Yohan" autocomplete="given-name"></div>
+<label class="auth-label">Ta date de naissance</label>
+<div class="auth-input-wrapper"><span>🎂</span><input id="birthDate" type="date"></div>
+<p id="ageError" class="auth-error"></p>
+<label class="auth-label">Ton genre</label>
+<div class="choice-grid">
+<button type="button" class="choice-button" data-value="male" onclick="selectAuthChoice(this,'gender')">👨 <span>Homme</span></button>
+<button type="button" class="choice-button" data-value="female" onclick="selectAuthChoice(this,'gender')">👩 <span>Femme</span></button>
+<button type="button" class="choice-button" data-value="non_binary" onclick="selectAuthChoice(this,'gender')">🧑 <span>Non-binaire</span></button>
+</div>
+<input type="hidden" id="gender">
+<div class="auth-navigation"><button type="button" class="back-button" onclick="previousAuthStep()">← Retour</button><button type="button" class="next-button" onclick="nextAuthStep()">Continuer →</button></div>
+</div>
 
-<p>Des rencontres basées sur les valeurs et la compatibilité.</p>
+<div class="auth-step" id="authStep3">
+<h1>Que recherches-tu ? 💕</h1>
+<p class="auth-subtitle">Choisis ce qui correspond le mieux à tes attentes.</p>
+<label class="auth-label">Je recherche</label>
+<div class="choice-grid">
+<button type="button" class="choice-button" data-value="male" onclick="selectAuthChoice(this,'lookingFor')">👨 <span>Un homme</span></button>
+<button type="button" class="choice-button" data-value="female" onclick="selectAuthChoice(this,'lookingFor')">👩 <span>Une femme</span></button>
+<button type="button" class="choice-button" data-value="non_binary" onclick="selectAuthChoice(this,'lookingFor')">🧑 <span>Non-binaire</span></button>
+<button type="button" class="choice-button" data-value="all" onclick="selectAuthChoice(this,'lookingFor')">💕 <span>Tout le monde</span></button>
+</div>
+<input type="hidden" id="lookingFor">
+<label class="auth-label">Type de recherche</label>
+<div class="relation-grid">
+<button type="button" class="relation-button" data-value="serious" onclick="selectAuthChoice(this,'searchCategory')">❤️ <span>Relation sérieuse</span></button>
+<button type="button" class="relation-button" data-value="dating" onclick="selectAuthChoice(this,'searchCategory')">💕 <span>Faire connaissance</span></button>
+<button type="button" class="relation-button" data-value="friendship" onclick="selectAuthChoice(this,'searchCategory')">🤝 <span>Amitié</span></button>
+<button type="button" class="relation-button" data-value="long_term" onclick="selectAuthChoice(this,'searchCategory')">💍 <span>Relation durable</span></button>
+<button type="button" class="relation-button" data-value="casual" onclick="selectAuthChoice(this,'searchCategory')">🔥 <span>Sans engagement</span></button>
+<button type="button" class="relation-button" data-value="open" onclick="selectAuthChoice(this,'searchCategory')">🌈 <span>Relation ouverte</span></button>
+</div>
+<input type="hidden" id="searchCategory">
+<label class="auth-label">Situation sentimentale</label>
+<select id="relationshipStatus"><option value="">Choisir...</option><option value="single">Célibataire</option><option value="relationship">En couple</option><option value="married">Marié(e)</option><option value="complicated">Relation compliquée</option><option value="open_relationship">Relation ouverte</option></select>
+<div class="auth-navigation"><button type="button" class="back-button" onclick="previousAuthStep()">← Retour</button><button type="button" class="next-button" onclick="nextAuthStep()">Continuer →</button></div>
+</div>
 
-<input id="email" type="email" placeholder="Email">
-<input id="password" type="password" placeholder="Mot de passe">
-<input id="firstName" placeholder="Prénom">
-<input id="birthDate" type="date">
-<p id="ageError" class="small" style="color:#d00;font-weight:bold"></p>
-
-<select id="gender">
-<option value="">Genre</option>
-<option value="male">Homme</option>
-<option value="female">Femme</option>
-<option value="non_binary">Non-binaire</option>
-</select>
-
-<select id="lookingFor">
-<option value="">Je recherche...</option>
-<option value="male">Un homme</option>
-<option value="female">Une femme</option>
-<option value="non_binary">Une personne non-binaire</option>
-<option value="all">Tout le monde</option>
-</select>
-
-
-<select id="relationshipStatus">
-<option value="">Situation sentimentale</option>
-<option value="single">Célibataire</option>
-<option value="relationship">En couple</option>
-<option value="married">Marié(e)</option>
-<option value="complicated">Relation compliquée</option>
-<option value="open_relationship">Relation ouverte</option>
-</select>
-
-<select id="searchCategory">
-<option value="">Type de recherche</option>
-<option value="serious">❤️ Relation sérieuse</option>
-<option value="casual">🔥 Sans engagement</option>
-<option value="friendship">🤝 Amitié</option>
-<option value="dating">💕 Faire connaissance</option>
-<option value="long_term">💍 Relation durable</option>
-<option value="open">🌈 Relation ouverte</option>
-</select>
-
-<input id="city" placeholder="Ville">
-<textarea id="bio" placeholder="Présente-toi"></textarea>
-
-<button onclick="signup()">Créer mon compte</button>
-<button class="secondary" onclick="login()">Se connecter</button>
-
-<p id="authMsg" class="small"></p>
-
+<div class="auth-step" id="authStep4">
+<h1>Dernière étape ✨</h1>
+<p class="auth-subtitle">Sécurise ton compte et ajoute une présentation.</p>
+<label class="auth-label">Ton email</label>
+<div class="auth-input-wrapper"><span>✉️</span><input id="email" type="email" placeholder="ton@email.com" autocomplete="email"></div>
+<label class="auth-label">Mot de passe</label>
+<div class="auth-input-wrapper"><span>🔒</span><input id="password" type="password" placeholder="Minimum 6 caractères" autocomplete="new-password"></div>
+<label class="auth-label">Ta ville</label>
+<div class="auth-input-wrapper"><span>📍</span><input id="city" type="text" placeholder="Ex. Autun"></div>
+<label class="auth-label">Ta présentation</label>
+<textarea id="bio" class="auth-textarea" maxlength="500" placeholder="Quelques mots sur toi..."></textarea>
+<div class="bio-counter">500 caractères maximum</div>
+<div id="authMsg" class="auth-message"></div>
+<div class="auth-navigation"><button type="button" class="back-button" onclick="previousAuthStep()">← Retour</button><button type="button" class="create-account-button" onclick="signup()">💕 Créer mon compte</button></div>
+<button type="button" class="auth-link-button" onclick="login()">J'ai déjà un compte</button>
+</div>
+</div>
 </section>
 
 <!-- ================= DECOUVRIR ================= -->
@@ -610,10 +651,6 @@ window.addEventListener(
     }
 );
 
-
-
-
-
 const PERSONALITY_QUESTIONS = [
 
  {
@@ -934,7 +971,6 @@ function escapeHtml(value){
   .replaceAll("'","&#039;");
 }
 
-
 function formatRelationship(value){
     const values = {
         single:"Célibataire",
@@ -945,6 +981,7 @@ function formatRelationship(value){
     };
     return values[value] || "Non renseigné";
 }
+
 function formatGender(gender){
 
  if(gender === "male")
@@ -958,7 +995,6 @@ function formatGender(gender){
 
  return "Non renseigné";
 }
-
 
 function renderPersonalityQuestions(){
 
@@ -1010,7 +1046,6 @@ function renderPersonalityQuestions(){
  ).join("");
 }
 
-
 function loadVerification(){
     const result = document.getElementById("aiPhotoResult");
     if(!result){ return; }
@@ -1021,6 +1056,7 @@ function loadVerification(){
         </p>
     `;
 }
+
 function getSearchBadge(category){
 
  if(category === "serious")
@@ -1044,21 +1080,16 @@ function getSearchBadge(category){
  return "🔎 Recherche non renseignée";
 }
 
-
-
 function safeArray(value){
-
     return Array.isArray(value)
         ? value
         : [];
 }
 
 function normalizeProfile(profile){
-
     if(!profile){
         return {};
     }
-
     return {
         ...profile,
         display_name:
@@ -1080,9 +1111,7 @@ function normalizeProfile(profile){
     };
 }
 
-
 function supabaseReady(){
-
     return (
         typeof db !== "undefined" &&
         db !== null
@@ -1090,12 +1119,9 @@ function supabaseReady(){
 }
 
 function showError(message){
-
     console.error(message);
-
     const element =
         document.getElementById("authMsg");
-
     if(element){
         element.textContent = message;
     } else {
@@ -1103,74 +1129,53 @@ function showError(message){
     }
 }
 
-
 async function safeLogout(){
-
     try{
-
         if(supabaseReady()){
             await db.auth.signOut();
         }
-
     }catch(error){
-
         console.error(
             "Erreur déconnexion :",
             error
         );
     }
-
     user = null;
-
     const nav =
         document.getElementById("nav");
-
     if(nav){
         nav.style.display = "none";
     }
-
     show("auth");
 }
 
-
 function validImageFile(file){
-
     if(!file){
         return false;
     }
-
     const allowed = [
         "image/jpeg",
         "image/png",
         "image/webp"
     ];
-
     if(!allowed.includes(file.type)){
         return false;
     }
-
     if(file.size > 8 * 1024 * 1024){
         return false;
     }
-
     return true;
 }
 
-
-
 async function checkDeveloperAccess(){
-
     const button =
         document.getElementById(
             "developerNavButton"
         );
-
     if(!button || !user){
         return false;
     }
-
     try{
-
         const {
             data,
             error
@@ -1178,46 +1183,34 @@ async function checkDeveloperAccess(){
         await db.rpc(
             "is_developer"
         );
-
         if(error){
             throw error;
         }
-
         if(data === true){
-
             button.style.display =
                 "block";
-
             return true;
         }
-
     }catch(error){
-
         console.error(
             "Developer access:",
             error
         );
     }
-
     button.style.display =
         "none";
-
     return false;
 }
 
 async function loadDeveloperPanel(){
-
     const stats =
         document.getElementById(
             "developerStats"
         );
-
     if(!stats){
         return;
     }
-
     try{
-
         const {
             data,
             error
@@ -1225,82 +1218,64 @@ async function loadDeveloperPanel(){
         await db.rpc(
             "developer_premium_stats"
         );
-
         if(error){
             throw error;
         }
-
         const revenue =
             Number(
                 data.total_revenue_cents || 0
             ) / 100;
-
         const monthRevenue =
             Number(
                 data.revenue_this_month_cents || 0
             ) / 100;
-
         stats.innerHTML = `
-
         <p>
             👑 Abonnés actifs :
             <strong>
             ${data.active_subscriptions || 0}
             </strong>
         </p>
-
         <p>
             💳 Paiements :
             <strong>
             ${data.total_payments || 0}
             </strong>
         </p>
-
         <p>
             💰 Revenus totaux :
             <strong>
             ${revenue.toFixed(2)} €
             </strong>
         </p>
-
         <p>
             📅 Ce mois :
             <strong>
             ${monthRevenue.toFixed(2)} €
             </strong>
         </p>
-
         `;
-
         await loadDeveloperData();
-
     }catch(error){
-
         console.error(error);
-
         stats.innerHTML =
             "<p>Accès développeur refusé.</p>";
     }
 }
 
-
 async function loadDeveloperData(){
-
     const subscriptions =
         document.getElementById(
             "developerSubscriptions"
         );
-
     const payments =
         document.getElementById(
             "developerPayments"
         );
-
     const plans =
         document.getElementById(
             "developerPlans"
         );
-
 
     const {
         data:subs
@@ -1318,15 +1293,11 @@ async function loadDeveloperData(){
         )
         .limit(50);
 
-
     if(subscriptions){
-
         subscriptions.innerHTML =
             (subs || [])
             .map(sub => `
-
                 <div class="card">
-
                     <p>
                     👤
                     ${escapeHtml(
@@ -1334,7 +1305,6 @@ async function loadDeveloperData(){
                     ).slice(0,8)}
                     ...
                     </p>
-
                     <p>
                     Statut :
                     <strong>
@@ -1343,7 +1313,6 @@ async function loadDeveloperData(){
                     )}
                     </strong>
                     </p>
-
                     <p class="small">
                     Fin :
                     ${sub.current_period_end
@@ -1352,18 +1321,15 @@ async function loadDeveloperData(){
                           ).toLocaleDateString("fr-FR")
                         : "—"}
                     </p>
-
                 </div>
-
             `)
             .join("")
             ||
             "<p>Aucun abonnement.</p>";
     }
 
-
     const {
-        data:payments
+        data:paymentRows
     } =
     await db
         .from("premium_payments")
@@ -1378,15 +1344,11 @@ async function loadDeveloperData(){
         )
         .limit(50);
 
-
     if(payments){
-
         payments.innerHTML =
-            (payments || [])
+            (paymentRows || [])
             .map(payment => `
-
                 <div class="card">
-
                     <p>
                     💳
                     <strong>
@@ -1400,13 +1362,11 @@ async function loadDeveloperData(){
                     )}
                     </strong>
                     </p>
-
                     <p>
                     ${escapeHtml(
                         payment.status
                     )}
                     </p>
-
                     <p class="small">
                     ${payment.paid_at
                         ? new Date(
@@ -1414,15 +1374,12 @@ async function loadDeveloperData(){
                           ).toLocaleString("fr-FR")
                         : "—"}
                     </p>
-
                 </div>
-
             `)
             .join("")
             ||
             "<p>Aucun paiement.</p>";
     }
-
 
     const {
         data:plansData
@@ -1432,21 +1389,16 @@ async function loadDeveloperData(){
         .select("*")
         .order("price_cents");
 
-
     if(plans){
-
         plans.innerHTML =
             (plansData || [])
             .map(plan => `
-
                 <div class="card">
-
                     <h3>
                     ${escapeHtml(
                         plan.name
                     )}
                     </h3>
-
                     <p>
                     ${(
                         Number(
@@ -1458,15 +1410,12 @@ async function loadDeveloperData(){
                     )}
                     / ${plan.duration_days} jours
                     </p>
-
                     <p>
                     ${plan.active
                         ? "🟢 Active"
                         : "🔴 Désactivée"}
                     </p>
-
                 </div>
-
             `)
             .join("")
             ||
@@ -1490,16 +1439,12 @@ function isAdult(date){
 }
 
 function age(date){
-
  if(!date) return "?";
-
  const d = new Date(date);
  const now = new Date();
-
  let result =
   now.getFullYear() -
   d.getFullYear();
-
  if(
   now.getMonth() < d.getMonth() ||
   (
@@ -1509,151 +1454,173 @@ function age(date){
  ){
   result--;
  }
-
  return result;
 }
 
 /* ================= INSCRIPTION ================= */
 
-async function signup(){
+let authStep = 1;
+const AUTH_TOTAL_STEPS = 4;
 
-    if(!supabaseReady()){
-        showError("Connexion au serveur indisponible.");
-        return;
+function updateAuthStep(){
+    for(let i=1;i<=AUTH_TOTAL_STEPS;i++){
+        const step=document.getElementById("authStep"+i);
+        if(step) step.classList.toggle("active",i===authStep);
     }
+    const bar=document.getElementById("authProgressBar");
+    if(bar) bar.style.width=((authStep/AUTH_TOTAL_STEPS)*100)+"%";
+    const n=document.getElementById("authStepNumber");
+    if(n) n.textContent=authStep;
+    window.scrollTo({top:0,behavior:"smooth"});
+}
 
-    const birthInput =
-        document.getElementById("birthDate");
+function validateAuthStep(){
+    if(authStep===2){
+        const first=document.getElementById("firstName")?.value.trim();
+        const birth=document.getElementById("birthDate")?.value;
+        const gender=document.getElementById("gender")?.value;
+        if(!first){alert("Indique ton prénom pour continuer.");return false;}
+        if(!birth || (typeof isAdult==="function" && !isAdult(birth))){
+            const e=document.getElementById("ageError");
+            if(e)e.textContent="Koeur est réservé aux personnes de 18 ans ou plus.";
+            return false;
+        }
+        if(!gender){alert("Sélectionne ton genre.");return false;}
+    }
+    if(authStep===3){
+        if(!document.getElementById("lookingFor")?.value){alert("Indique qui tu recherches.");return false;}
+        if(!document.getElementById("searchCategory")?.value){alert("Choisis ton type de recherche.");return false;}
+        if(!document.getElementById("relationshipStatus")?.value){alert("Choisis ta situation sentimentale.");return false;}
+    }
+    return true;
+}
 
-    const birth_date =
-        birthInput ? birthInput.value : "";
+function nextAuthStep(){if(validateAuthStep()&&authStep<AUTH_TOTAL_STEPS){authStep++;updateAuthStep();}}
+function previousAuthStep(){if(authStep>1){authStep--;updateAuthStep();}}
 
-    if(!isAdult(birth_date)){
+function selectAuthChoice(button,inputId){
+    button.parentElement.querySelectorAll(".selected").forEach(x=>x.classList.remove("selected"));
+    button.classList.add("selected");
+    const input=document.getElementById(inputId);
+    if(input)input.value=button.dataset.value;
+}
 
-        const ageError =
-            document.getElementById("ageError");
+document.addEventListener("DOMContentLoaded",function(){updateAuthStep();});
 
-        if(ageError){
-            ageError.textContent =
-                "Koeur est réservé aux personnes âgées de 18 ans ou plus.";
+async function signup(){
+    const authMsg = document.getElementById("authMsg");
+    try {
+        if(!supabaseReady()){
+            authMsg.textContent = "Connexion au serveur indisponible.";
+            return;
+        }
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const display_name = document.getElementById("firstName").value.trim();
+        const birth_date = document.getElementById("birthDate").value;
+        const gender = document.getElementById("gender").value;
+        const looking_for = document.getElementById("lookingFor").value;
+        const relationship_status = document.getElementById("relationshipStatus").value;
+        const search_category = document.getElementById("searchCategory").value;
+        const city = document.getElementById("city").value.trim();
+        const bio = document.getElementById("bio").value.trim();
+
+        const ageError = document.getElementById("ageError");
+        if(ageError) ageError.textContent = "";
+
+        if(!email || !password || !display_name || !birth_date){
+            authMsg.textContent = "Remplis les champs obligatoires.";
+            return;
         }
 
-        return;
+        if(password.length < 6){
+            authMsg.textContent = "Le mot de passe doit contenir au moins 6 caractères.";
+            return;
+        }
+
+        if(!isAdult(birth_date)){
+            if(ageError){
+                ageError.textContent =
+                    "Koeur est réservé aux personnes âgées de 18 ans ou plus.";
+            }
+            return;
+        }
+
+        authMsg.textContent = "Création du compte...";
+
+        const { data, error } = await db.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    display_name,
+                    birth_date,
+                    gender,
+                    looking_for,
+                    relationship_status,
+                    search_category,
+                    city,
+                    bio
+                }
+            }
+        });
+
+        if(error){
+            console.error("Erreur inscription:", error);
+            authMsg.textContent = error.message;
+            return;
+        }
+
+        if(!data || !data.user){
+            authMsg.textContent = "Supabase n'a pas créé le compte.";
+            return;
+        }
+
+        if(!data.session){
+            authMsg.textContent =
+                "Compte créé ✅ Vérifie ton email puis reconnecte-toi.";
+            return;
+        }
+
+        const { error: profileError } = await db
+            .from("profiles")
+            .upsert({
+                id: data.user.id,
+                display_name,
+                birth_date,
+                gender,
+                looking_for,
+                relationship_status,
+                search_category,
+                city,
+                bio,
+                updated_at: new Date().toISOString()
+            });
+
+        if(profileError){
+            console.error("Erreur profil:", profileError);
+            authMsg.textContent =
+                "Compte créé, mais profil non enregistré : " +
+                profileError.message;
+            return;
+        }
+
+        user = data.user;
+        authMsg.textContent = "Compte créé avec succès ✅";
+        await startApp();
+        await checkDeveloperAccess();
+
+    } catch(error) {
+        console.error("Erreur inattendue lors de l'inscription:", error);
+        authMsg.textContent =
+            "Une erreur est survenue pendant la création du compte.";
     }
-
-
-
- const email =
-  document.getElementById("email")
-  .value.trim();
-
- const password =
-  document.getElementById("password")
-  .value;
-
- const display_name =
-  document.getElementById("firstName")
-  .value.trim();
-
- document.getElementById("ageError").textContent = "";
-
- const gender =
-  document.getElementById("gender").value;
-
- const looking_for =
-  document.getElementById("lookingFor").value;
-
- const relationship_status =
-  document.getElementById("relationshipStatus").value;
-
- const search_category =
-  document.getElementById("searchCategory").value;
-
- const city =
-  document.getElementById("city")
-  .value.trim();
-
- const bio =
-  document.getElementById("bio")
-  .value.trim();
-
- if(
-  !email ||
-  !password ||
-  !display_name ||
-  !birth_date
- ){
-
-  authMsg.textContent =
-   "Remplis les champs obligatoires.";
-
-  return;
- }
-
- const {
-  data,
-  error
- } =
- await db.auth.signUp({
-
-  email,
-  password,
-
-  options:{
-   data:{
-    display_name,
-    birth_date
-   }
-  }
-
- });
-
- if(error){
-
-  authMsg.textContent =
-   error.message;
-
-  return;
- }
-
- if(data.user){
-
-  const {
-   error:profileError
-  } =
-  await db
-   .from("profiles")
-   .upsert({
-
-    id:data.user.id,
-    display_name,
-    birth_date,
-    gender,
-    looking_for,
-    relationship_status,
-    search_category,
-    city,
-    bio
-
-   });
-
-  if(profileError){
-
-   authMsg.textContent =
-    profileError.message;
-
-   return;
-  }
- }
-
- authMsg.textContent =
-  "Compte créé. Vérifie ton email si nécessaire.";
 }
 
 /* ================= CONNEXION ================= */
 
 async function login(){
-
+ const authMsg = document.getElementById("authMsg");
  const email =
   document.getElementById("email")
   .value.trim();
@@ -1661,23 +1628,26 @@ async function login(){
  const password =
   document.getElementById("password")
   .value;
+
+ if(!email || !password){
+  authMsg.textContent = "Email et mot de passe requis.";
+  return;
+ }
+
+ authMsg.textContent = "Connexion...";
 
  const {
   data,
   error
  } =
  await db.auth.signInWithPassword({
-
   email,
   password
-
  });
 
  if(error){
-
   authMsg.textContent =
    error.message;
-
   return;
  }
 
@@ -1693,9 +1663,7 @@ async function login(){
 
 /* ================= DEMARRAGE ================= */
 
-
 async function verifyAdultAccount(){
-
  const {
   data,
   error
@@ -1706,15 +1674,11 @@ async function verifyAdultAccount(){
   .single();
 
  if(error || !data || !isAdult(data.birth_date)){
-
   await db.auth.signOut();
-
   alert(
    "Koeur est réservé aux personnes âgées de 18 ans ou plus."
   );
-
   location.reload();
-
   return false;
  }
 
@@ -1722,7 +1686,6 @@ async function verifyAdultAccount(){
 }
 
 async function startApp(){
-
  document
   .getElementById("auth")
   .classList.remove("active");
@@ -1748,6 +1711,8 @@ async function startApp(){
 /* ================= PROFILS ================= */
 
 async function loadProfiles(){
+ const profiles = document.getElementById("profiles");
+ if(!profiles) return;
 
  profiles.innerHTML =
   "<p>Chargement...</p>";
@@ -1763,25 +1728,20 @@ async function loadProfiles(){
   .limit(30);
 
  if(error){
-
   profiles.innerHTML =
    "<p>Erreur de chargement.</p>";
-
   return;
  }
 
  if(!data || !data.length){
-
   profiles.innerHTML =
    "<p>Aucun profil disponible.</p>";
-
   return;
  }
 
  const visible = [];
 
  for(const profile of data){
-
   const {
    data:blocked
   } =
@@ -1794,16 +1754,13 @@ async function loadProfiles(){
   );
 
   if(!blocked){
-
    visible.push(profile);
   }
  }
 
  if(!visible.length){
-
   profiles.innerHTML =
    "<p>Aucun nouveau profil.</p>";
-
   return;
  }
 
@@ -1877,7 +1834,6 @@ async function loadProfiles(){
  `).join("");
 
  for(const profile of visible){
-
   const score =
    await getCompatibility(
     profile.id
@@ -1889,7 +1845,6 @@ async function loadProfiles(){
    );
 
   if(compatibility){
-
    compatibility.textContent =
     score > 0
     ? "Compatibilité : "+score+" %"
@@ -1905,7 +1860,6 @@ async function loadProfiles(){
 /* ================= PHOTO PROFIL ================= */
 
 async function loadProfilePhoto(profileId){
-
  const {
   data,
   error
@@ -1942,18 +1896,13 @@ async function loadProfilePhoto(profileId){
  `;
 }
 
-/* ================= UPLOAD PHOTO ================= */
-
-
-
-
-
 async function loadAlchemy(){
-
  const container =
   document.getElementById(
    "alchemyMatches"
   );
+
+ if(!container) return;
 
  const {
   data,
@@ -1968,10 +1917,8 @@ async function loadAlchemy(){
   );
 
  if(error || !data || !data.length){
-
   container.innerHTML =
    "<p>Aucun match pour le moment.</p>";
-
   return;
  }
 
@@ -2007,7 +1954,6 @@ async function loadAlchemy(){
 }
 
 async function calculateAlchemy(otherId){
-
  const result =
   document.getElementById(
    "coupleAlchemy"
@@ -2036,10 +1982,8 @@ async function calculateAlchemy(otherId){
   .single();
 
  if(!me || !other){
-
   result.innerHTML =
    "<p>Impossible de calculer l'alchimie.</p>";
-
   return;
  }
 
@@ -2080,13 +2024,10 @@ async function calculateAlchemy(otherId){
 
  if(score >= 80)
   title = "✨ Très forte alchimie symbolique";
-
  else if(score >= 60)
   title = "💕 Belle alchimie";
-
  else if(score >= 40)
   title = "🔮 Alchimie intéressante";
-
  else
   title = "🌙 Alchimie à découvrir";
 
@@ -2128,19 +2069,14 @@ async function calculateAlchemy(otherId){
  `;
 
  try{
-
   await db
    .from("alchemy_results")
    .insert({
-
     user_a:user.id,
     user_b:otherId,
     score:score
-
    });
-
  }catch(e){
-
   console.log(
    "Historique alchimie non enregistré"
   );
@@ -2148,7 +2084,6 @@ async function calculateAlchemy(otherId){
 }
 
 async function loadMyAlchemy(){
-
  const result =
   document.getElementById(
    "myAlchemy"
@@ -2167,10 +2102,8 @@ async function loadMyAlchemy(){
   .single();
 
  if(error){
-
   result.innerHTML =
    "<p>Profil indisponible.</p>";
-
   return;
  }
 
@@ -2227,15 +2160,10 @@ async function loadMyAlchemy(){
  `;
 }
 
-
-
-
 async function calculatePersonality(){
-
  const answers = {};
 
  for(const question of PERSONALITY_QUESTIONS){
-
   const selected =
    document.querySelector(
     'input[name="personality_'+
@@ -2244,11 +2172,9 @@ async function calculatePersonality(){
    );
 
   if(!selected){
-
    alert(
     "Réponds à toutes les questions."
    );
-
    return;
   }
 
@@ -2531,11 +2457,9 @@ async function calculatePersonality(){
  `;
 
  try{
-
   await db
    .from("personality_results")
    .insert({
-
     user_id:user.id,
     profile_type:type,
     communication_style:communication,
@@ -2543,11 +2467,8 @@ async function calculatePersonality(){
     conflict_style:conflict,
     main_expectation:expectation,
     answers:answers
-
    });
-
  }catch(error){
-
   console.log(
    "Résultat non sauvegardé :",
    error.message
@@ -2556,7 +2477,6 @@ async function calculatePersonality(){
 }
 
 function startRosicrucianMeditation(){
-
  const value =
   document.getElementById(
    "rosicrucianVirtue"
@@ -2589,11 +2509,9 @@ function startRosicrucianMeditation(){
  </div>
 
  `;
-
 }
 
 async function generateRosicrucianProfile(){
-
  const result =
   document.getElementById(
    "rosicrucianResult"
@@ -2663,19 +2581,14 @@ async function generateRosicrucianProfile(){
  `;
 
  try{
-
   await db
    .from("rosicrucian_profiles")
    .insert({
-
     user_id:user.id,
     symbol:symbol.name,
     virtue:virtue.title
-
    });
-
  }catch(e){
-
   console.log(
    "Historique symbolique non enregistré"
   );
@@ -2683,7 +2596,6 @@ async function generateRosicrucianProfile(){
 }
 
 async function generateTotem(){
-
  const keys =
   Object.keys(TOTEMS);
 
@@ -2735,16 +2647,13 @@ async function generateTotem(){
  `;
 
  try{
-
   await db
    .from("totem_results")
    .insert({
     user_id:user.id,
     totem_code:keys[index]
    });
-
  }catch(e){
-
   console.log(
    "Historique totem non enregistré"
   );
@@ -2752,7 +2661,6 @@ async function generateTotem(){
 }
 
 async function analyzePhotoAI(){
-
  const input =
   document.getElementById("aiPhotoFile");
 
@@ -2763,26 +2671,20 @@ async function analyzePhotoAI(){
   document.getElementById("aiPhotoResult");
 
  if(!file){
-
   result.innerHTML =
    "<p>Choisis une photo.</p>";
-
   return;
  }
 
  if(!file.type.startsWith("image/")){
-
   result.innerHTML =
    "<p>Format image requis.</p>";
-
   return;
  }
 
  if(file.size > 5 * 1024 * 1024){
-
   result.innerHTML =
    "<p>La photo doit faire moins de 5 Mo.</p>";
-
   return;
  }
 
@@ -2796,7 +2698,6 @@ async function analyzePhotoAI(){
   URL.createObjectURL(file);
 
  image.onload = async function(){
-
   const width =
    image.naturalWidth;
 
@@ -2854,17 +2755,14 @@ async function analyzePhotoAI(){
  };
 
  image.onerror = function(){
-
   result.innerHTML =
    "<p>Impossible de lire cette image.</p>";
-
  };
 
  image.src = url;
 }
 
 async function uploadPhoto(){
-
  const input =
   document.getElementById(
    "photoFile"
@@ -2874,11 +2772,9 @@ async function uploadPhoto(){
   input.files[0];
 
  if(!file){
-
   alert(
    "Choisis une photo."
   );
-
   return;
  }
 
@@ -2889,20 +2785,16 @@ async function uploadPhoto(){
    "image/webp"
   ].includes(file.type)
  ){
-
   alert(
    "Format accepté : JPG, PNG ou WebP."
   );
-
   return;
  }
 
  if(file.size > 5242880){
-
   alert(
    "La photo doit faire moins de 5 Mo."
   );
-
   return;
  }
 
@@ -2934,12 +2826,10 @@ async function uploadPhoto(){
   );
 
  if(uploadError){
-
   alert(
    "Erreur photo : "+
    uploadError.message
   );
-
   return;
  }
 
@@ -2956,17 +2846,13 @@ async function uploadPhoto(){
  await db
   .from("profile_photos")
   .insert({
-
    user_id:user.id,
    photo_url:url.publicUrl,
    position:0
-
   });
 
  if(insertError){
-
   alert(insertError.message);
-
   return;
  }
 
@@ -2982,17 +2868,14 @@ async function uploadPhoto(){
 /* ================= LIKE ================= */
 
 async function likeUser(profileId){
-
  const {
   error
  } =
  await db
   .from("likes")
   .insert({
-
    from_user:user.id,
    to_user:profileId
-
   });
 
  if(
@@ -3001,9 +2884,7 @@ async function likeUser(profileId){
    .toLowerCase()
    .includes("duplicate")
  ){
-
   alert(error.message);
-
   return;
  }
 
@@ -3017,6 +2898,8 @@ async function likeUser(profileId){
 /* ================= MATCHS ================= */
 
 async function loadMatches(){
+ const matchesList = document.getElementById("matchesList");
+ if(!matchesList) return;
 
  const {
   data,
@@ -3033,18 +2916,14 @@ async function loadMatches(){
   );
 
  if(error){
-
   matchesList.innerHTML =
    "<p>Erreur de chargement.</p>";
-
   return;
  }
 
  if(!data || !data.length){
-
   matchesList.innerHTML =
    "<p>Pas encore de match.</p>";
-
   return;
  }
 
@@ -3066,7 +2945,6 @@ async function loadMatches(){
  matchesList.innerHTML =
  (profilesData || [])
  .map(profile => {
-
   const match =
    data.find(item =>
     item.user_a === profile.id ||
@@ -3111,7 +2989,6 @@ async function loadMatches(){
 /* ================= MESSAGES ================= */
 
 async function openChat(matchId){
-
  selectedMatch =
   matchId;
 
@@ -3121,12 +2998,12 @@ async function openChat(matchId){
 }
 
 async function loadMessages(){
+ const messagesList = document.getElementById("messagesList");
+ if(!messagesList) return;
 
  if(!selectedMatch){
-
   messagesList.innerHTML =
    "<p>Sélectionne un match.</p>";
-
   return;
  }
 
@@ -3149,10 +3026,8 @@ async function loadMessages(){
   );
 
  if(error){
-
   messagesList.textContent =
    error.message;
-
   return;
  }
 
@@ -3189,7 +3064,6 @@ async function loadMessages(){
 }
 
 async function sendMessage(){
-
  if(!selectedMatch)return;
 
  const input =
@@ -3197,10 +3071,10 @@ async function sendMessage(){
    "messageInput"
   );
 
- const content =
+ const body =
   input.value.trim();
 
- if(!content)return;
+ if(!body)return;
 
  const {
   error
@@ -3208,17 +3082,13 @@ async function sendMessage(){
  await db
   .from("messages")
   .insert({
-
    match_id:selectedMatch,
    sender_id:user.id,
    body
-
   });
 
  if(error){
-
   alert(error.message);
-
   return;
  }
 
@@ -3230,7 +3100,6 @@ async function sendMessage(){
 /* ================= BLOCAGE ================= */
 
 async function blockUser(profileId){
-
  if(!confirm(
   "Bloquer cette personne ?"
  ))return;
@@ -3241,16 +3110,12 @@ async function blockUser(profileId){
  await db
   .from("blocks")
   .insert({
-
    blocker_id:user.id,
    blocked_id:profileId
-
   });
 
  if(error){
-
   alert(error.message);
-
   return;
  }
 
@@ -3265,7 +3130,6 @@ async function blockUser(profileId){
 /* ================= SIGNALEMENT ================= */
 
 async function reportUser(profileId){
-
  const reason =
   prompt(
    "Pourquoi veux-tu signaler ce profil ?"
@@ -3279,17 +3143,13 @@ async function reportUser(profileId){
  await db
   .from("reports")
   .insert({
-
    reporter_id:user.id,
    reported_id:profileId,
    reason:reason
-
   });
 
  if(error){
-
   alert(error.message);
-
   return;
  }
 
@@ -3303,7 +3163,6 @@ async function reportUser(profileId){
 async function getCompatibility(
  profileId
 ){
-
  const {
   data,
   error
@@ -3323,34 +3182,31 @@ async function getCompatibility(
 
 /* ================= PROFIL ================= */
 
-
-
 function loadDailyRoseSymbol(){
     const result = document.getElementById("dailyRoseSymbol");
     if(!result){ return; }
-    const symbols = ROSICRUCIAN_SYMBOLS;
-    if(!symbols.length){
-        result.textContent = "Aucun symbole disponible.";
+    if(typeof ROSICRUCIAN_SYMBOLS === "undefined" || !ROSICRUCIAN_SYMBOLS.length){
+        result.textContent = "Symbole indisponible.";
         return;
     }
-    const today = new Date();
+    const now = new Date();
     const index = (
-        today.getFullYear() * 372 +
-        today.getMonth() * 31 +
-        today.getDate()
-    ) % symbols.length;
-    const symbol = symbols[index];
+        now.getFullYear() * 372 +
+        now.getMonth() * 31 +
+        now.getDate()
+    ) % ROSICRUCIAN_SYMBOLS.length;
+    const symbol = ROSICRUCIAN_SYMBOLS[index];
     result.innerHTML = `
         <div class="card">
-            <div style="font-size:55px">${escapeHtml(symbol.symbol)}</div>
+            <div style="font-size:60px">${escapeHtml(symbol.symbol)}</div>
             <h3>${escapeHtml(symbol.name)}</h3>
             <p><strong>${escapeHtml(symbol.theme)}</strong></p>
             <p>${escapeHtml(symbol.meaning)}</p>
         </div>
     `;
 }
-async function loadRosicrucianProfile(){
 
+async function loadRosicrucianProfile(){
  loadDailyRoseSymbol();
 
  const result =
@@ -3376,12 +3232,9 @@ async function loadRosicrucianProfile(){
  </div>
 
  `;
-
 }
 
-
 async function loadPersonality(){
-
  renderPersonalityQuestions();
 
  const result =
@@ -3390,7 +3243,6 @@ async function loadPersonality(){
   );
 
  if(result){
-
   result.innerHTML = `
    <p class="small">
     Réponds aux 10 questions pour obtenir ton bilan.
@@ -3400,7 +3252,6 @@ async function loadPersonality(){
 }
 
 async function loadProfile(){
-
  const {
   data,
   error
@@ -3411,31 +3262,28 @@ async function loadProfile(){
   .eq("id",user.id)
   .single();
 
- if(error){
+ const myProfile = document.getElementById("myProfile");
+ if(!myProfile) return;
 
+ if(error){
   myProfile.innerHTML =
    "<p>Erreur de profil.</p>";
-
   return;
  }
 
- editGender.value =
-  data.gender || "";
+ const editGender = document.getElementById("editGender");
+ const editLookingFor = document.getElementById("editLookingFor");
+ const editRelationshipStatus = document.getElementById("editRelationshipStatus");
+ const editSearchCategory = document.getElementById("editSearchCategory");
+ const editCity = document.getElementById("editCity");
+ const editBio = document.getElementById("editBio");
 
- editLookingFor.value =
-  data.looking_for || "";
-
- editRelationshipStatus.value =
-  data.relationship_status || "";
-
- editSearchCategory.value =
-  data.search_category || "";
-
- editCity.value =
-  data.city || "";
-
- editBio.value =
-  data.bio || "";
+ if(editGender) editGender.value = data.gender || "";
+ if(editLookingFor) editLookingFor.value = data.looking_for || "";
+ if(editRelationshipStatus) editRelationshipStatus.value = data.relationship_status || "";
+ if(editSearchCategory) editSearchCategory.value = data.search_category || "";
+ if(editCity) editCity.value = data.city || "";
+ if(editBio) editBio.value = data.bio || "";
 
  const {
   data:photos
@@ -3449,7 +3297,6 @@ async function loadProfile(){
  let photoHtml = "";
 
  if(photos && photos.length){
-
   photoHtml =
    photos.map(photo => `
 
@@ -3500,56 +3347,54 @@ async function loadProfile(){
 
 async function updateProfile(){
     if(!user){ alert("Session expirée."); return; }
-    const gender = document.getElementById("editGender").value;
-    const looking_for = document.getElementById("editLookingFor").value;
-    const relationship_status = document.getElementById("editRelationshipStatus").value;
-    const search_category = document.getElementById("editSearchCategory").value;
-    const city = document.getElementById("editCity").value.trim();
-    const bio = document.getElementById("editBio").value.trim();
+
+    const editGender = document.getElementById("editGender");
+    const editLookingFor = document.getElementById("editLookingFor");
+    const editRelationshipStatus = document.getElementById("editRelationshipStatus");
+    const editSearchCategory = document.getElementById("editSearchCategory");
+    const editCity = document.getElementById("editCity");
+    const editBio = document.getElementById("editBio");
+
+    const gender = editGender ? editGender.value : "";
+    const looking_for = editLookingFor ? editLookingFor.value : "";
+    const relationship_status = editRelationshipStatus ? editRelationshipStatus.value : "";
+    const search_category = editSearchCategory ? editSearchCategory.value : "";
+    const city = editCity ? editCity.value.trim() : "";
+    const bio = editBio ? editBio.value.trim() : "";
+
     const { error } = await db.from("profiles").update({
         gender, looking_for, relationship_status, search_category, city, bio
     }).eq("id", user.id);
+
     if(error){
         console.error(error);
         alert("Impossible d'enregistrer le profil : " + error.message);
         return;
     }
+
     alert("Profil enregistré ✅");
     await loadProfile();
     await loadProfiles();
 }
 
-/* ================= DECONNEXION ================= */
-
-async function logout(){
-
- await db.auth.signOut();
-
- location.reload();
-}
-
 /* ================= SESSION ================= */
 
 (async()=>{
-
  const {
   data
  } =
  await db.auth.getSession();
 
  if(data.session){
-
   user =
    data.session.user;
 
   await startApp();
+  await checkDeveloperAccess();
  }
-
 })();
 
-
 async function reportIntegrity(profileId){
-
  const reason = prompt(
   "Décris brièvement la situation suspecte :"
  );
@@ -3579,280 +3424,6 @@ async function reportIntegrity(profileId){
  );
 }
 
-
-
-/* =========================================================
-   KOEUR GLOBAL HOTFIX
-   ========================================================= */
-
-function formatRelationship(value){
-    const map = {
-        single:"Célibataire",
-        relationship:"En couple",
-        married:"Marié(e)",
-        complicated:"Relation compliquée",
-        open_relationship:"Relation ouverte"
-    };
-    return map[value] || "Non renseigné";
-}
-
-function loadVerification(){
-    const result = document.getElementById("aiPhotoResult");
-    if(!result){ return; }
-    result.innerHTML = `
-        <p class="small">
-            Sélectionne une photo puis lance
-            l'analyse technique.
-        </p>
-    `;
-}
-
-function loadDailyRoseSymbol(){
-    const result = document.getElementById("dailyRoseSymbol");
-    if(!result){ return; }
-    if(typeof ROSICRUCIAN_SYMBOLS === "undefined" || !ROSICRUCIAN_SYMBOLS.length){
-        result.textContent = "Symbole indisponible.";
-        return;
-    }
-    const now = new Date();
-    const index = (
-        now.getFullYear() * 372 +
-        now.getMonth() * 31 +
-        now.getDate()
-    ) % ROSICRUCIAN_SYMBOLS.length;
-    const symbol = ROSICRUCIAN_SYMBOLS[index];
-    result.innerHTML = `
-        <div class="card">
-            <div style="font-size:60px">${escapeHtml(symbol.symbol)}</div>
-            <h3>${escapeHtml(symbol.name)}</h3>
-            <p><strong>${escapeHtml(symbol.theme)}</strong></p>
-            <p>${escapeHtml(symbol.meaning)}</p>
-        </div>
-    `;
-}
-
-async function signup(){
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-    const display_name = document.getElementById("firstName").value.trim();
-    const birth_date = document.getElementById("birthDate").value;
-    const gender = document.getElementById("gender").value;
-    const looking_for = document.getElementById("lookingFor").value;
-    const relationship_status = document.getElementById("relationshipStatus").value;
-    const search_category = document.getElementById("searchCategory").value;
-    const city = document.getElementById("city").value.trim();
-    const bio = document.getElementById("bio").value.trim();
-    const msg = document.getElementById("authMsg");
-
-    if(!email || !password || !display_name || !birth_date){
-        msg.textContent = "Remplis tous les champs obligatoires.";
-        return;
-    }
-
-    if(!isAdult(birth_date)){
-        msg.textContent = "Koeur est réservé aux personnes de 18 ans ou plus.";
-        return;
-    }
-
-    msg.textContent = "Création du compte...";
-
-    const { data, error } = await db.auth.signUp({
-        email,
-        password,
-        options:{
-            data:{
-                display_name,
-                birth_date
-            }
-        }
-    });
-
-    if(error){
-        msg.textContent = error.message;
-        return;
-    }
-
-    if(!data.user){
-        msg.textContent = "Compte non créé.";
-        return;
-    }
-
-    const { error:profileError } = await db
-        .from("profiles")
-        .upsert({
-            id:data.user.id,
-            display_name,
-            birth_date,
-            gender,
-            looking_for,
-            relationship_status,
-            search_category,
-            city,
-            bio
-        });
-
-    if(profileError){
-        console.error(profileError);
-        msg.textContent = profileError.message;
-        return;
-    }
-
-    msg.textContent = "Compte créé ✅ Vérifie ton email si nécessaire.";
-}
-
-async function updateProfile(){
-    if(!user){
-        alert("Session expirée.");
-        return;
-    }
-
-    const gender = document.getElementById("editGender").value;
-    const looking_for = document.getElementById("editLookingFor").value;
-    const relationship_status = document.getElementById("editRelationshipStatus").value;
-    const search_category = document.getElementById("editSearchCategory").value;
-    const city = document.getElementById("editCity").value.trim();
-    const bio = document.getElementById("editBio").value.trim();
-
-    const { error } = await db
-        .from("profiles")
-        .update({
-            gender,
-            looking_for,
-            relationship_status,
-            search_category,
-            city,
-            bio,
-            updated_at: new Date().toISOString()
-        })
-        .eq("id", user.id);
-
-    if(error){
-        console.error(error);
-        alert("Erreur : " + error.message);
-        return;
-    }
-
-    alert("Profil enregistré ✅");
-    await loadProfile();
-    await loadProfiles();
-}
-
-async function sendMessage(){
-    if(!selectedMatch){
-        return;
-    }
-
-    const input = document.getElementById("messageInput");
-    const body = input.value.trim();
-
-    if(!body){
-        return;
-    }
-
-    const { error } = await db
-        .from("messages")
-        .insert({
-            match_id: selectedMatch,
-            sender_id: user.id,
-            body
-        });
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    input.value = "";
-    await loadMessages();
-}
-
-async function loadMessages(){
-    if(!selectedMatch){
-        messagesList.innerHTML = "<p>Sélectionne un match.</p>";
-        return;
-    }
-
-    const { data, error } = await db
-        .from("messages")
-        .select("*")
-        .eq("match_id", selectedMatch)
-        .order("created_at", { ascending: true });
-
-    if(error){
-        messagesList.textContent = error.message;
-        return;
-    }
-
-    messagesList.innerHTML = (data || [])
-        .map(message => `
-            <div class="message ${message.sender_id === user.id ? "mine" : ""}">
-                <b>${message.sender_id === user.id ? "Moi" : "Match"}</b>
-                <p>${escapeHtml(message.body)}</p>
-            </div>
-        `)
-        .join("");
-}
-
-async function uploadPhoto(){
-    const input = document.getElementById("photoFile");
-    const file = input.files[0];
-
-    if(!file){
-        alert("Choisis une photo.");
-        return;
-    }
-
-    const allowed = ["image/jpeg", "image/png", "image/webp"];
-    if(!allowed.includes(file.type)){
-        alert("JPG, PNG ou WebP uniquement.");
-        return;
-    }
-
-    if(file.size > 5 * 1024 * 1024){
-        alert("Photo limitée à 5 Mo.");
-        return;
-    }
-
-    const extension = file.name.split(".").pop().toLowerCase();
-    const path = user.id + "/" + crypto.randomUUID() + "." + extension;
-
-    const { error:uploadError } = await db.storage
-        .from("profile-photos")
-        .upload(path, file, { contentType: file.type, upsert:false });
-
-    if(uploadError){
-        alert(uploadError.message);
-        return;
-    }
-
-    const { data:urlData } = db.storage.from("profile-photos").getPublicUrl(path);
-    const { error } = await db
-        .from("profile_photos")
-        .insert({
-            user_id:user.id,
-            photo_url:urlData.publicUrl,
-            position:0
-        });
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    input.value = "";
-    alert("Photo ajoutée ✅");
-    await loadProfile();
-}
-
-window.addEventListener("error", event => {
-    console.error("[KOEUR]", event.error || event.message);
-});
-
-window.addEventListener("unhandledrejection", event => {
-    console.error("[KOEUR PROMISE]", event.reason);
-});
-
 </script>
-
 </body>
 </html>
