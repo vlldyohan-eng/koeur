@@ -4,7 +4,65 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Koeur ♥</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+async function blockUser(profileId){
+
+    if(!confirm("Bloquer cette personne ?")) return;
+
+    const {error} = await db
+        .from("blocks")
+        .insert({
+            blocker_id: currentUser.id,
+            blocked_id: profileId
+        });
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    alert("Profil bloqué.");
+    await loadProfiles();
+}
+
+async function reportUser(profileId){
+
+    const reason = prompt(
+        "Pourquoi veux-tu signaler ce profil ?"
+    );
+
+    if(!reason) return;
+
+    const {error} = await db
+        .from("reports")
+        .insert({
+            reporter_id: currentUser.id,
+            reported_id: profileId,
+            reason: reason
+        });
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    alert("Signalement envoyé.");
+}
+
+async function getCompatibility(profileId){
+
+    const {data,error} = await db
+        .rpc("compatibility_score", {
+            user1: currentUser.id,
+            user2: profileId
+        });
+
+    if(error) return 0;
+
+    return data || 0;
+}
+
+</script>
 <style>
 body{margin:0;font-family:Arial;background:#f7f6fa;color:#18131b}
 .app{max-width:480px;margin:auto;min-height:100vh;background:white}
@@ -330,6 +388,64 @@ function escapeHtml(value){
   await startApp();
  }
 })();
+
+async function blockUser(profileId){
+
+    if(!confirm("Bloquer cette personne ?")) return;
+
+    const {error} = await db
+        .from("blocks")
+        .insert({
+            blocker_id: currentUser.id,
+            blocked_id: profileId
+        });
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    alert("Profil bloqué.");
+    await loadProfiles();
+}
+
+async function reportUser(profileId){
+
+    const reason = prompt(
+        "Pourquoi veux-tu signaler ce profil ?"
+    );
+
+    if(!reason) return;
+
+    const {error} = await db
+        .from("reports")
+        .insert({
+            reporter_id: currentUser.id,
+            reported_id: profileId,
+            reason: reason
+        });
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    alert("Signalement envoyé.");
+}
+
+async function getCompatibility(profileId){
+
+    const {data,error} = await db
+        .rpc("compatibility_score", {
+            user1: currentUser.id,
+            user2: profileId
+        });
+
+    if(error) return 0;
+
+    return data || 0;
+}
+
 </script>
 
 </body>
