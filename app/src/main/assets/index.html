@@ -332,63 +332,6 @@ function escapeHtml(value){
  }
 })();
 
-async function blockUser(profileId){
-
-    if(!confirm("Bloquer cette personne ?")) return;
-
-    const {error} = await db
-        .from("blocks")
-        .insert({
-            blocker_id: user.id,
-            blocked_id: profileId
-        });
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    alert("Profil bloqué.");
-    await loadProfiles();
-}
-
-async function reportUser(profileId){
-
-    const reason = prompt(
-        "Pourquoi veux-tu signaler ce profil ?"
-    );
-
-    if(!reason) return;
-
-    const {error} = await db
-        .from("reports")
-        .insert({
-            reporter_id: user.id,
-            reported_id: profileId,
-            reason: reason
-        });
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    alert("Signalement envoyé.");
-}
-
-async function getCompatibility(profileId){
-
-    const {data,error} = await db
-        .rpc("compatibility_score", {
-            user1: user.id,
-            user2: profileId
-        });
-
-    if(error) return 0;
-
-    return data || 0;
-}
-
 
 async function blockUser(profileId) {
     if (!confirm("Bloquer cette personne ?")) return;
