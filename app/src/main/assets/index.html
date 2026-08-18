@@ -132,6 +132,22 @@ button{
 <input id="password" type="password" placeholder="Mot de passe">
 <input id="firstName" placeholder="Prénom">
 <input id="birthDate" type="date">
+
+<select id="gender">
+<option value="">Genre</option>
+<option value="male">Homme</option>
+<option value="female">Femme</option>
+<option value="non_binary">Non-binaire</option>
+</select>
+
+<select id="lookingFor">
+<option value="">Je recherche...</option>
+<option value="male">Un homme</option>
+<option value="female">Une femme</option>
+<option value="non_binary">Une personne non-binaire</option>
+<option value="all">Tout le monde</option>
+</select>
+
 <input id="city" placeholder="Ville">
 <textarea id="bio" placeholder="Présente-toi"></textarea>
 
@@ -185,6 +201,21 @@ Chargement...
 <h1>Mon profil 👤</h1>
 
 <div id="myProfile"></div>
+
+<select id="editGender">
+<option value="">Genre</option>
+<option value="male">Homme</option>
+<option value="female">Femme</option>
+<option value="non_binary">Non-binaire</option>
+</select>
+
+<select id="editLookingFor">
+<option value="">Je recherche...</option>
+<option value="male">Un homme</option>
+<option value="female">Une femme</option>
+<option value="non_binary">Une personne non-binaire</option>
+<option value="all">Tout le monde</option>
+</select>
 
 <input id="editCity" placeholder="Ville">
 
@@ -276,6 +307,21 @@ function escapeHtml(value){
   .replaceAll('"',"&quot;")
   .replaceAll("'","&#039;");
 }
+
+function formatGender(gender){
+
+ if(gender === "male")
+  return "Homme";
+
+ if(gender === "female")
+  return "Femme";
+
+ if(gender === "non_binary")
+  return "Non-binaire";
+
+ return "Non renseigné";
+}
+
 
 function age(date){
 
