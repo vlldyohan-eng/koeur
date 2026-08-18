@@ -1,0 +1,9 @@
+.gradle/
+build/
+**/build/
+local.properties
+*.iml
+.idea/
+app/src/main/assets/*.bak
+app/src/main/assets/*.backup
+.DS_Store
