@@ -1,7 +1,0 @@
-com.koeur.app-pngs-0 /workspaces/koeur/app/build/generated/res/pngs/debug
-com.koeur.app-resValues-1 /workspaces/koeur/app/build/generated/res/resValues/debug
-com.koeur.app-packageDebugResources-2 /workspaces/koeur/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-com.koeur.app-packageDebugResources-3 /workspaces/koeur/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-com.koeur.app-debug-4 /workspaces/koeur/app/build/intermediates/merged_res/debug/mergeDebugResources
-com.koeur.app-debug-5 /workspaces/koeur/app/src/debug/res
-com.koeur.app-main-6 /workspaces/koeur/app/src/main/res
