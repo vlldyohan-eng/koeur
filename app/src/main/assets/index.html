@@ -2,10 +2,26 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta name="theme-color" content="#ff3d78">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Koeur ♥</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+<script>
+window.addEventListener(
+    "error",
+    function(event){
+        console.error("Koeur JavaScript:", event.error || event.message);
+    }
+);
+window.addEventListener(
+    "unhandledrejection",
+    function(event){
+        console.error("Koeur Promise:", event.reason);
+    }
+);
+</script>
+
 
 <style>
 *{box-sizing:border-box}
@@ -147,6 +163,26 @@ button{
 <option value="female">Une femme</option>
 <option value="non_binary">Une personne non-binaire</option>
 <option value="all">Tout le monde</option>
+</select>
+
+
+<select id="relationshipStatus">
+<option value="">Situation sentimentale</option>
+<option value="single">Célibataire</option>
+<option value="relationship">En couple</option>
+<option value="married">Marié(e)</option>
+<option value="complicated">Relation compliquée</option>
+<option value="open_relationship">Relation ouverte</option>
+</select>
+
+<select id="searchCategory">
+<option value="">Type de recherche</option>
+<option value="serious">❤️ Relation sérieuse</option>
+<option value="casual">🔥 Sans engagement</option>
+<option value="friendship">🤝 Amitié</option>
+<option value="dating">💕 Faire connaissance</option>
+<option value="long_term">💍 Relation durable</option>
+<option value="open">🌈 Relation ouverte</option>
 </select>
 
 <input id="city" placeholder="Ville">
@@ -384,26 +420,64 @@ pas un diagnostic psychologique.
 
 </section>
 
+
+<section id="developer">
+
+<h1>🛠️ Espace développeur</h1>
+
+<div class="card">
+
+<h2>💰 Revenus Premium</h2>
+
+<p class="small">
+Espace privé réservé au développeur.
+</p>
+
+<div id="developerStats">
+Chargement...
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>👑 Abonnements</h2>
+
+<div id="developerSubscriptions">
+Chargement...
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>💳 Transactions</h2>
+
+<div id="developerPayments">
+Chargement...
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>⚙️ Offre Premium</h2>
+
+<div id="developerPlans">
+Chargement...
+</div>
+
+</div>
+
+</section>
 <section id="profile">
 
 <h1>Mon profil 👤</h1>
 
 <div id="myProfile"></div>
-
-<select id="editGender">
-<option value="">Genre</option>
-<option value="male">Homme</option>
-<option value="female">Femme</option>
-<option value="non_binary">Non-binaire</option>
-</select>
-
-<select id="editLookingFor">
-<option value="">Je recherche...</option>
-<option value="male">Un homme</option>
-<option value="female">Une femme</option>
-<option value="non_binary">Une personne non-binaire</option>
-<option value="all">Tout le monde</option>
-</select>
 
 <select id="editGender">
 <option value="">Genre</option>
@@ -457,7 +531,7 @@ pas un diagnostic psychologique.
 Enregistrer mon profil
 </button>
 
-<button class="secondary" onclick="logout()">
+<button class="secondary" onclick="safeLogout()">
 Se déconnecter
 </button>
 
@@ -497,6 +571,14 @@ Se déconnecter
 🧠<br>Personnalité
 </button>
 
+
+<button
+ id="developerNavButton"
+ style="display:none"
+ onclick="show('developer');loadDeveloperPanel()">
+🛠️<br>Développeur
+</button>
+
 <button onclick="show('profile');loadProfile()">
 👤<br>Profil
 </button>
@@ -506,6 +588,28 @@ Se déconnecter
 </div>
 
 <script>
+window.addEventListener(
+    "unhandledrejection",
+    function(event){
+
+        console.error(
+            "Erreur asynchrone Koeur:",
+            event.reason
+        );
+    }
+);
+
+window.addEventListener(
+    "error",
+    function(event){
+
+        console.error(
+            "Erreur JavaScript Koeur:",
+            event.error || event.message
+        );
+    }
+);
+
 
 
 
@@ -830,6 +934,17 @@ function escapeHtml(value){
   .replaceAll("'","&#039;");
 }
 
+
+function formatRelationship(value){
+    const values = {
+        single:"Célibataire",
+        relationship:"En couple",
+        married:"Marié(e)",
+        complicated:"Relation compliquée",
+        open_relationship:"Relation ouverte"
+    };
+    return values[value] || "Non renseigné";
+}
 function formatGender(gender){
 
  if(gender === "male")
@@ -895,6 +1010,17 @@ function renderPersonalityQuestions(){
  ).join("");
 }
 
+
+function loadVerification(){
+    const result = document.getElementById("aiPhotoResult");
+    if(!result){ return; }
+    result.innerHTML = `
+        <p class="small">
+            Sélectionne une photo puis lance
+            l'analyse technique.
+        </p>
+    `;
+}
 function getSearchBadge(category){
 
  if(category === "serious")
@@ -918,32 +1044,449 @@ function getSearchBadge(category){
  return "🔎 Recherche non renseignée";
 }
 
+
+
+function safeArray(value){
+
+    return Array.isArray(value)
+        ? value
+        : [];
+}
+
+function normalizeProfile(profile){
+
+    if(!profile){
+        return {};
+    }
+
+    return {
+        ...profile,
+        display_name:
+            profile.display_name ||
+            profile.display_name ||
+            "",
+        gender:
+            profile.gender || "",
+        looking_for:
+            profile.looking_for || "",
+        relationship_status:
+            profile.relationship_status || "",
+        search_category:
+            profile.search_category || "",
+        city:
+            profile.city || "",
+        bio:
+            profile.bio || ""
+    };
+}
+
+
+function supabaseReady(){
+
+    return (
+        typeof db !== "undefined" &&
+        db !== null
+    );
+}
+
+function showError(message){
+
+    console.error(message);
+
+    const element =
+        document.getElementById("authMsg");
+
+    if(element){
+        element.textContent = message;
+    } else {
+        alert(message);
+    }
+}
+
+
+async function safeLogout(){
+
+    try{
+
+        if(supabaseReady()){
+            await db.auth.signOut();
+        }
+
+    }catch(error){
+
+        console.error(
+            "Erreur déconnexion :",
+            error
+        );
+    }
+
+    user = null;
+
+    const nav =
+        document.getElementById("nav");
+
+    if(nav){
+        nav.style.display = "none";
+    }
+
+    show("auth");
+}
+
+
+function validImageFile(file){
+
+    if(!file){
+        return false;
+    }
+
+    const allowed = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ];
+
+    if(!allowed.includes(file.type)){
+        return false;
+    }
+
+    if(file.size > 8 * 1024 * 1024){
+        return false;
+    }
+
+    return true;
+}
+
+
+
+async function checkDeveloperAccess(){
+
+    const button =
+        document.getElementById(
+            "developerNavButton"
+        );
+
+    if(!button || !user){
+        return false;
+    }
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+        await db.rpc(
+            "is_developer"
+        );
+
+        if(error){
+            throw error;
+        }
+
+        if(data === true){
+
+            button.style.display =
+                "block";
+
+            return true;
+        }
+
+    }catch(error){
+
+        console.error(
+            "Developer access:",
+            error
+        );
+    }
+
+    button.style.display =
+        "none";
+
+    return false;
+}
+
+async function loadDeveloperPanel(){
+
+    const stats =
+        document.getElementById(
+            "developerStats"
+        );
+
+    if(!stats){
+        return;
+    }
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+        await db.rpc(
+            "developer_premium_stats"
+        );
+
+        if(error){
+            throw error;
+        }
+
+        const revenue =
+            Number(
+                data.total_revenue_cents || 0
+            ) / 100;
+
+        const monthRevenue =
+            Number(
+                data.revenue_this_month_cents || 0
+            ) / 100;
+
+        stats.innerHTML = `
+
+        <p>
+            👑 Abonnés actifs :
+            <strong>
+            ${data.active_subscriptions || 0}
+            </strong>
+        </p>
+
+        <p>
+            💳 Paiements :
+            <strong>
+            ${data.total_payments || 0}
+            </strong>
+        </p>
+
+        <p>
+            💰 Revenus totaux :
+            <strong>
+            ${revenue.toFixed(2)} €
+            </strong>
+        </p>
+
+        <p>
+            📅 Ce mois :
+            <strong>
+            ${monthRevenue.toFixed(2)} €
+            </strong>
+        </p>
+
+        `;
+
+        await loadDeveloperData();
+
+    }catch(error){
+
+        console.error(error);
+
+        stats.innerHTML =
+            "<p>Accès développeur refusé.</p>";
+    }
+}
+
+
+async function loadDeveloperData(){
+
+    const subscriptions =
+        document.getElementById(
+            "developerSubscriptions"
+        );
+
+    const payments =
+        document.getElementById(
+            "developerPayments"
+        );
+
+    const plans =
+        document.getElementById(
+            "developerPlans"
+        );
+
+
+    const {
+        data:subs
+    } =
+    await db
+        .from("premium_subscriptions")
+        .select(
+            "id,user_id,status,current_period_end,created_at"
+        )
+        .order(
+            "created_at",
+            {
+                ascending:false
+            }
+        )
+        .limit(50);
+
+
+    if(subscriptions){
+
+        subscriptions.innerHTML =
+            (subs || [])
+            .map(sub => `
+
+                <div class="card">
+
+                    <p>
+                    👤
+                    ${escapeHtml(
+                        String(sub.user_id)
+                    ).slice(0,8)}
+                    ...
+                    </p>
+
+                    <p>
+                    Statut :
+                    <strong>
+                    ${escapeHtml(
+                        sub.status
+                    )}
+                    </strong>
+                    </p>
+
+                    <p class="small">
+                    Fin :
+                    ${sub.current_period_end
+                        ? new Date(
+                            sub.current_period_end
+                          ).toLocaleDateString("fr-FR")
+                        : "—"}
+                    </p>
+
+                </div>
+
+            `)
+            .join("")
+            ||
+            "<p>Aucun abonnement.</p>";
+    }
+
+
+    const {
+        data:payments
+    } =
+    await db
+        .from("premium_payments")
+        .select(
+            "id,amount_cents,currency,status,paid_at,created_at"
+        )
+        .order(
+            "created_at",
+            {
+                ascending:false
+            }
+        )
+        .limit(50);
+
+
+    if(payments){
+
+        payments.innerHTML =
+            (payments || [])
+            .map(payment => `
+
+                <div class="card">
+
+                    <p>
+                    💳
+                    <strong>
+                    ${(
+                        Number(
+                            payment.amount_cents
+                        ) / 100
+                    ).toFixed(2)}
+                    ${escapeHtml(
+                        payment.currency || "EUR"
+                    )}
+                    </strong>
+                    </p>
+
+                    <p>
+                    ${escapeHtml(
+                        payment.status
+                    )}
+                    </p>
+
+                    <p class="small">
+                    ${payment.paid_at
+                        ? new Date(
+                            payment.paid_at
+                          ).toLocaleString("fr-FR")
+                        : "—"}
+                    </p>
+
+                </div>
+
+            `)
+            .join("")
+            ||
+            "<p>Aucun paiement.</p>";
+    }
+
+
+    const {
+        data:plansData
+    } =
+    await db
+        .from("premium_plans")
+        .select("*")
+        .order("price_cents");
+
+
+    if(plans){
+
+        plans.innerHTML =
+            (plansData || [])
+            .map(plan => `
+
+                <div class="card">
+
+                    <h3>
+                    ${escapeHtml(
+                        plan.name
+                    )}
+                    </h3>
+
+                    <p>
+                    ${(
+                        Number(
+                            plan.price_cents
+                        ) / 100
+                    ).toFixed(2)}
+                    ${escapeHtml(
+                        plan.currency
+                    )}
+                    / ${plan.duration_days} jours
+                    </p>
+
+                    <p>
+                    ${plan.active
+                        ? "🟢 Active"
+                        : "🔴 Désactivée"}
+                    </p>
+
+                </div>
+
+            `)
+            .join("")
+            ||
+            "<p>Aucune offre.</p>";
+    }
+}
+
 function isAdult(date){
-
- if(!date) return false;
-
- const birth = new Date(date);
- const today = new Date();
-
- let years =
-  today.getFullYear() -
-  birth.getFullYear();
-
- const month =
-  today.getMonth() -
-  birth.getMonth();
-
- if(
-  month < 0 ||
-  (
-   month === 0 &&
-   today.getDate() < birth.getDate()
-  )
- ){
-  years--;
- }
-
- return years >= 18;
+    if(!date){ return false; }
+    const birth = new Date(date + "T00:00:00");
+    if(Number.isNaN(birth.getTime())){ return false; }
+    const today = new Date();
+    let years = today.getFullYear() - birth.getFullYear();
+    if(
+        today.getMonth() < birth.getMonth() ||
+        (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())
+    ){
+        years--;
+    }
+    return years >= 18;
 }
 
 function age(date){
@@ -974,6 +1517,32 @@ function age(date){
 
 async function signup(){
 
+    if(!supabaseReady()){
+        showError("Connexion au serveur indisponible.");
+        return;
+    }
+
+    const birthInput =
+        document.getElementById("birthDate");
+
+    const birth_date =
+        birthInput ? birthInput.value : "";
+
+    if(!isAdult(birth_date)){
+
+        const ageError =
+            document.getElementById("ageError");
+
+        if(ageError){
+            ageError.textContent =
+                "Koeur est réservé aux personnes âgées de 18 ans ou plus.";
+        }
+
+        return;
+    }
+
+
+
  const email =
   document.getElementById("email")
   .value.trim();
@@ -982,23 +1551,11 @@ async function signup(){
   document.getElementById("password")
   .value;
 
- const first_name =
+ const display_name =
   document.getElementById("firstName")
   .value.trim();
 
- const birth_date =
-  document.getElementById("birthDate")
-  .value;
-
- if(!isAdult(birth_date)){
-
-  document.getElementById("ageError").textContent =
-   "Koeur est réservé aux personnes âgées de 18 ans ou plus.";
-
-  return;
-}
-
-document.getElementById("ageError").textContent = "";
+ document.getElementById("ageError").textContent = "";
 
  const gender =
   document.getElementById("gender").value;
@@ -1023,7 +1580,7 @@ document.getElementById("ageError").textContent = "";
  if(
   !email ||
   !password ||
-  !first_name ||
+  !display_name ||
   !birth_date
  ){
 
@@ -1044,7 +1601,7 @@ document.getElementById("ageError").textContent = "";
 
   options:{
    data:{
-    first_name,
+    display_name,
     birth_date
    }
   }
@@ -1069,7 +1626,7 @@ document.getElementById("ageError").textContent = "";
    .upsert({
 
     id:data.user.id,
-    first_name,
+    display_name,
     birth_date,
     gender,
     looking_for,
@@ -1131,6 +1688,7 @@ async function login(){
  }
 
  await startApp();
+ await checkDeveloperAccess();
 }
 
 /* ================= DEMARRAGE ================= */
@@ -1176,7 +1734,15 @@ async function startApp(){
  show("discover");
 
  await loadProfiles();
- await loadAlchemy();
+
+ try{
+    await loadAlchemy();
+ }catch(error){
+    console.error(
+        "Alchimie indisponible :",
+        error
+    );
+ }
 }
 
 /* ================= PROFILS ================= */
@@ -1249,7 +1815,7 @@ async function loadProfiles(){
   <div id="photo-${profile.id}"></div>
 
   <h2>
-   ${escapeHtml(profile.first_name)},
+   ${escapeHtml(profile.display_name)},
    ${age(profile.birth_date)}
   </h2>
 
@@ -1421,7 +1987,7 @@ async function loadAlchemy(){
  } =
  await db
   .from("profiles")
-  .select("id,first_name")
+  .select("id,display_name")
   .in("id",ids);
 
  container.innerHTML =
@@ -1433,7 +1999,7 @@ async function loadAlchemy(){
    onclick="calculateAlchemy('${person.id}')">
 
    ⚗️ Alchimie avec
-   ${escapeHtml(person.first_name)}
+   ${escapeHtml(person.display_name)}
 
   </button>
 
@@ -1464,7 +2030,7 @@ async function calculateAlchemy(otherId){
  await db
   .from("profiles")
   .select(
-   "search_category,relationship_status,gender,first_name"
+   "search_category,relationship_status,gender,display_name"
   )
   .eq("id",otherId)
   .single();
@@ -1542,7 +2108,7 @@ async function calculateAlchemy(otherId){
 
   <p>
    Profil de ${escapeHtml(
-    other.first_name
+    other.display_name
    )}
   </p>
 
@@ -1595,7 +2161,7 @@ async function loadMyAlchemy(){
  await db
   .from("profiles")
   .select(
-   "first_name,gender,looking_for,relationship_status,search_category"
+   "display_name,gender,looking_for,relationship_status,search_category"
   )
   .eq("id",user.id)
   .single();
@@ -2515,7 +3081,7 @@ async function loadMatches(){
 
    <h2>
     💕 ${escapeHtml(
-     profile.first_name
+     profile.display_name
     )}
    </h2>
 
@@ -2613,7 +3179,7 @@ async function loadMessages(){
 
    <p>
     ${escapeHtml(
-     message.content
+     message.body
     )}
    </p>
 
@@ -2645,7 +3211,7 @@ async function sendMessage(){
 
    match_id:selectedMatch,
    sender_id:user.id,
-   content
+   body
 
   });
 
@@ -2758,6 +3324,31 @@ async function getCompatibility(
 /* ================= PROFIL ================= */
 
 
+
+function loadDailyRoseSymbol(){
+    const result = document.getElementById("dailyRoseSymbol");
+    if(!result){ return; }
+    const symbols = ROSICRUCIAN_SYMBOLS;
+    if(!symbols.length){
+        result.textContent = "Aucun symbole disponible.";
+        return;
+    }
+    const today = new Date();
+    const index = (
+        today.getFullYear() * 372 +
+        today.getMonth() * 31 +
+        today.getDate()
+    ) % symbols.length;
+    const symbol = symbols[index];
+    result.innerHTML = `
+        <div class="card">
+            <div style="font-size:55px">${escapeHtml(symbol.symbol)}</div>
+            <h3>${escapeHtml(symbol.name)}</h3>
+            <p><strong>${escapeHtml(symbol.theme)}</strong></p>
+            <p>${escapeHtml(symbol.meaning)}</p>
+        </div>
+    `;
+}
 async function loadRosicrucianProfile(){
 
  loadDailyRoseSymbol();
@@ -2880,7 +3471,7 @@ async function loadProfile(){
 
   <h2>
    ${escapeHtml(
-    data.first_name
+    data.display_name
    )}
   </h2>
 
@@ -2908,57 +3499,24 @@ async function loadProfile(){
 /* ================= MODIFICATION ================= */
 
 async function updateProfile(){
-
- const gender =
-  document.getElementById("editGender").value;
-
- const looking_for =
-  document.getElementById("editLookingFor").value;
-
- const relationship_status =
-  document.getElementById("editRelationshipStatus").value;
-
- const search_category =
-  document.getElementById("editSearchCategory").value;
-
- const city =
-  document.getElementById(
-   "editCity"
-  ).value.trim();
-
- const bio =
-  document.getElementById(
-   "editBio"
-  ).value.trim();
-
- const {
-  error
- } =
- await db
-  .from("profiles")
-  .update({
-   relationship_status,
-   search_category,
-   city,
-   bio
-  })
-  .eq(
-   "id",
-   user.id
-  );
-
- if(error){
-
-  alert(error.message);
-
-  return;
- }
-
- alert(
-  "Profil enregistré ✅"
- );
-
- await loadProfile();
+    if(!user){ alert("Session expirée."); return; }
+    const gender = document.getElementById("editGender").value;
+    const looking_for = document.getElementById("editLookingFor").value;
+    const relationship_status = document.getElementById("editRelationshipStatus").value;
+    const search_category = document.getElementById("editSearchCategory").value;
+    const city = document.getElementById("editCity").value.trim();
+    const bio = document.getElementById("editBio").value.trim();
+    const { error } = await db.from("profiles").update({
+        gender, looking_for, relationship_status, search_category, city, bio
+    }).eq("id", user.id);
+    if(error){
+        console.error(error);
+        alert("Impossible d'enregistrer le profil : " + error.message);
+        return;
+    }
+    alert("Profil enregistré ✅");
+    await loadProfile();
+    await loadProfiles();
 }
 
 /* ================= DECONNEXION ================= */
@@ -3020,6 +3578,279 @@ async function reportIntegrity(profileId){
   "Signalement transmis à la modération."
  );
 }
+
+
+
+/* =========================================================
+   KOEUR GLOBAL HOTFIX
+   ========================================================= */
+
+function formatRelationship(value){
+    const map = {
+        single:"Célibataire",
+        relationship:"En couple",
+        married:"Marié(e)",
+        complicated:"Relation compliquée",
+        open_relationship:"Relation ouverte"
+    };
+    return map[value] || "Non renseigné";
+}
+
+function loadVerification(){
+    const result = document.getElementById("aiPhotoResult");
+    if(!result){ return; }
+    result.innerHTML = `
+        <p class="small">
+            Sélectionne une photo puis lance
+            l'analyse technique.
+        </p>
+    `;
+}
+
+function loadDailyRoseSymbol(){
+    const result = document.getElementById("dailyRoseSymbol");
+    if(!result){ return; }
+    if(typeof ROSICRUCIAN_SYMBOLS === "undefined" || !ROSICRUCIAN_SYMBOLS.length){
+        result.textContent = "Symbole indisponible.";
+        return;
+    }
+    const now = new Date();
+    const index = (
+        now.getFullYear() * 372 +
+        now.getMonth() * 31 +
+        now.getDate()
+    ) % ROSICRUCIAN_SYMBOLS.length;
+    const symbol = ROSICRUCIAN_SYMBOLS[index];
+    result.innerHTML = `
+        <div class="card">
+            <div style="font-size:60px">${escapeHtml(symbol.symbol)}</div>
+            <h3>${escapeHtml(symbol.name)}</h3>
+            <p><strong>${escapeHtml(symbol.theme)}</strong></p>
+            <p>${escapeHtml(symbol.meaning)}</p>
+        </div>
+    `;
+}
+
+async function signup(){
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const display_name = document.getElementById("firstName").value.trim();
+    const birth_date = document.getElementById("birthDate").value;
+    const gender = document.getElementById("gender").value;
+    const looking_for = document.getElementById("lookingFor").value;
+    const relationship_status = document.getElementById("relationshipStatus").value;
+    const search_category = document.getElementById("searchCategory").value;
+    const city = document.getElementById("city").value.trim();
+    const bio = document.getElementById("bio").value.trim();
+    const msg = document.getElementById("authMsg");
+
+    if(!email || !password || !display_name || !birth_date){
+        msg.textContent = "Remplis tous les champs obligatoires.";
+        return;
+    }
+
+    if(!isAdult(birth_date)){
+        msg.textContent = "Koeur est réservé aux personnes de 18 ans ou plus.";
+        return;
+    }
+
+    msg.textContent = "Création du compte...";
+
+    const { data, error } = await db.auth.signUp({
+        email,
+        password,
+        options:{
+            data:{
+                display_name,
+                birth_date
+            }
+        }
+    });
+
+    if(error){
+        msg.textContent = error.message;
+        return;
+    }
+
+    if(!data.user){
+        msg.textContent = "Compte non créé.";
+        return;
+    }
+
+    const { error:profileError } = await db
+        .from("profiles")
+        .upsert({
+            id:data.user.id,
+            display_name,
+            birth_date,
+            gender,
+            looking_for,
+            relationship_status,
+            search_category,
+            city,
+            bio
+        });
+
+    if(profileError){
+        console.error(profileError);
+        msg.textContent = profileError.message;
+        return;
+    }
+
+    msg.textContent = "Compte créé ✅ Vérifie ton email si nécessaire.";
+}
+
+async function updateProfile(){
+    if(!user){
+        alert("Session expirée.");
+        return;
+    }
+
+    const gender = document.getElementById("editGender").value;
+    const looking_for = document.getElementById("editLookingFor").value;
+    const relationship_status = document.getElementById("editRelationshipStatus").value;
+    const search_category = document.getElementById("editSearchCategory").value;
+    const city = document.getElementById("editCity").value.trim();
+    const bio = document.getElementById("editBio").value.trim();
+
+    const { error } = await db
+        .from("profiles")
+        .update({
+            gender,
+            looking_for,
+            relationship_status,
+            search_category,
+            city,
+            bio,
+            updated_at: new Date().toISOString()
+        })
+        .eq("id", user.id);
+
+    if(error){
+        console.error(error);
+        alert("Erreur : " + error.message);
+        return;
+    }
+
+    alert("Profil enregistré ✅");
+    await loadProfile();
+    await loadProfiles();
+}
+
+async function sendMessage(){
+    if(!selectedMatch){
+        return;
+    }
+
+    const input = document.getElementById("messageInput");
+    const body = input.value.trim();
+
+    if(!body){
+        return;
+    }
+
+    const { error } = await db
+        .from("messages")
+        .insert({
+            match_id: selectedMatch,
+            sender_id: user.id,
+            body
+        });
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    input.value = "";
+    await loadMessages();
+}
+
+async function loadMessages(){
+    if(!selectedMatch){
+        messagesList.innerHTML = "<p>Sélectionne un match.</p>";
+        return;
+    }
+
+    const { data, error } = await db
+        .from("messages")
+        .select("*")
+        .eq("match_id", selectedMatch)
+        .order("created_at", { ascending: true });
+
+    if(error){
+        messagesList.textContent = error.message;
+        return;
+    }
+
+    messagesList.innerHTML = (data || [])
+        .map(message => `
+            <div class="message ${message.sender_id === user.id ? "mine" : ""}">
+                <b>${message.sender_id === user.id ? "Moi" : "Match"}</b>
+                <p>${escapeHtml(message.body)}</p>
+            </div>
+        `)
+        .join("");
+}
+
+async function uploadPhoto(){
+    const input = document.getElementById("photoFile");
+    const file = input.files[0];
+
+    if(!file){
+        alert("Choisis une photo.");
+        return;
+    }
+
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if(!allowed.includes(file.type)){
+        alert("JPG, PNG ou WebP uniquement.");
+        return;
+    }
+
+    if(file.size > 5 * 1024 * 1024){
+        alert("Photo limitée à 5 Mo.");
+        return;
+    }
+
+    const extension = file.name.split(".").pop().toLowerCase();
+    const path = user.id + "/" + crypto.randomUUID() + "." + extension;
+
+    const { error:uploadError } = await db.storage
+        .from("profile-photos")
+        .upload(path, file, { contentType: file.type, upsert:false });
+
+    if(uploadError){
+        alert(uploadError.message);
+        return;
+    }
+
+    const { data:urlData } = db.storage.from("profile-photos").getPublicUrl(path);
+    const { error } = await db
+        .from("profile_photos")
+        .insert({
+            user_id:user.id,
+            photo_url:urlData.publicUrl,
+            position:0
+        });
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    input.value = "";
+    alert("Photo ajoutée ✅");
+    await loadProfile();
+}
+
+window.addEventListener("error", event => {
+    console.error("[KOEUR]", event.error || event.message);
+});
+
+window.addEventListener("unhandledrejection", event => {
+    console.error("[KOEUR PROMISE]", event.reason);
+});
 
 </script>
 
