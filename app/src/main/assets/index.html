@@ -4,384 +4,1247 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Koeur ♥</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-body{margin:0;font-family:Arial;background:#f7f6fa;color:#18131b}
-.app{max-width:480px;margin:auto;min-height:100vh;background:white}
-header{padding:18px;font-size:28px;font-weight:bold;color:#ff3d78}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#f7f6fa;
+ color:#18131b;
+ font-family:Arial,sans-serif
+}
+.app{
+ max-width:480px;
+ min-height:100vh;
+ margin:auto;
+ background:#fff
+}
+header{
+ padding:18px;
+ font-size:28px;
+ font-weight:900;
+ color:#ff3d78;
+ border-bottom:1px solid #eee
+}
 main{padding:18px 18px 90px}
-section{display:none}.active{display:block}
-input,textarea,button{width:100%;padding:13px;margin:7px 0;box-sizing:border-box;border-radius:12px;border:1px solid #ddd}
-button{background:#ff3d78;color:white;border:0;font-weight:bold}
-.secondary{background:#eee;color:#222}
-.card{padding:18px;border-radius:20px;background:#faf8ff;margin:12px 0}
-.nav{position:fixed;bottom:0;width:min(480px,100%);display:flex;background:white;border-top:1px solid #ddd}
-.nav button{background:white;color:#555;border-radius:0;margin:0}
-h1{margin-top:0}
-.small{color:#777;font-size:13px}
+section{display:none}
+.active{display:block}
+input,textarea,button{
+ width:100%;
+ padding:13px;
+ margin:7px 0;
+ border-radius:12px;
+ border:1px solid #ddd;
+ font-size:15px
+}
+textarea{
+ min-height:90px;
+ resize:vertical
+}
+button{
+ background:#ff3d78;
+ color:#fff;
+ border:0;
+ font-weight:bold
+}
+.secondary{
+ background:#eee;
+ color:#222
+}
+.card{
+ padding:18px;
+ margin:12px 0;
+ border-radius:20px;
+ background:#faf8ff
+}
+.photo{
+ width:100%;
+ aspect-ratio:1/1;
+ object-fit:cover;
+ border-radius:18px;
+ background:#eee
+}
+.compat{
+ color:#ff3d78;
+ font-weight:bold
+}
+.small{
+ color:#777;
+ font-size:13px
+}
+.logo{
+ text-align:center;
+ font-size:70px;
+ color:#ff3d78
+}
+.nav{
+ position:fixed;
+ bottom:0;
+ left:50%;
+ transform:translateX(-50%);
+ width:min(480px,100%);
+ display:flex;
+ background:#fff;
+ border-top:1px solid #ddd;
+ z-index:20
+}
+.nav button{
+ background:#fff;
+ color:#555;
+ border-radius:0;
+ margin:0;
+ font-size:12px
+}
+.message{
+ padding:10px 13px;
+ margin:6px 0;
+ border-radius:15px;
+ background:#eee
+}
+.mine{
+ background:#ffe0ea;
+ text-align:right
+}
 </style>
 </head>
 
 <body>
+
 <div class="app">
 
 <header>Koeur ♥</header>
 
 <main>
 
+<!-- ================= AUTH ================= -->
+
 <section id="auth" class="active">
-<h1>Bienvenue ❤️</h1>
-<p>Rencontre des personnes qui partagent tes valeurs.</p>
+
+<div class="logo">♥</div>
+
+<h1>Bienvenue sur Koeur</h1>
+
+<p>Des rencontres basées sur les valeurs et la compatibilité.</p>
 
 <input id="email" type="email" placeholder="Email">
 <input id="password" type="password" placeholder="Mot de passe">
 <input id="firstName" placeholder="Prénom">
 <input id="birthDate" type="date">
 <input id="city" placeholder="Ville">
+<textarea id="bio" placeholder="Présente-toi"></textarea>
 
 <button onclick="signup()">Créer mon compte</button>
 <button class="secondary" onclick="login()">Se connecter</button>
 
 <p id="authMsg" class="small"></p>
+
 </section>
+
+<!-- ================= DECOUVRIR ================= -->
 
 <section id="discover">
+
 <h1>Découvrir 💕</h1>
-<div id="profiles"></div>
+
+<div id="profiles">
+Chargement...
+</div>
+
 </section>
+
+<!-- ================= MATCHS ================= -->
 
 <section id="matches">
-<h1>Mes matchs 💕</h1>
+
+<h1>Mes matchs 💖</h1>
+
 <div id="matchesList"></div>
+
 </section>
+
+<!-- ================= MESSAGES ================= -->
 
 <section id="messages">
+
 <h1>Messages 💬</h1>
+
 <div id="messagesList"></div>
+
 <input id="messageInput" placeholder="Écrire un message">
+
 <button onclick="sendMessage()">Envoyer</button>
+
 </section>
 
+<!-- ================= PROFIL ================= -->
+
 <section id="profile">
+
 <h1>Mon profil 👤</h1>
+
 <div id="myProfile"></div>
-<button class="secondary" onclick="logout()">Se déconnecter</button>
+
+<input id="editCity" placeholder="Ville">
+
+<textarea id="editBio" placeholder="Présentation"></textarea>
+
+<input
+ id="photoFile"
+ type="file"
+ accept="image/jpeg,image/png,image/webp">
+
+<button onclick="uploadPhoto()">
+📸 Ajouter une photo
+</button>
+
+<button onclick="updateProfile()">
+Enregistrer mon profil
+</button>
+
+<button class="secondary" onclick="logout()">
+Se déconnecter
+</button>
+
 </section>
 
 </main>
 
+<!-- ================= NAVIGATION ================= -->
+
 <div class="nav" id="nav" style="display:none">
-<button onclick="show('discover');loadProfiles()">💕<br>Découvrir</button>
-<button onclick="show('matches');loadMatches()">💖<br>Matchs</button>
-<button onclick="show('messages');loadMatches()">💬<br>Messages</button>
-<button onclick="show('profile');loadProfile()">👤<br>Profil</button>
+
+<button onclick="show('discover');loadProfiles()">
+💕<br>Découvrir
+</button>
+
+<button onclick="show('matches');loadMatches()">
+💖<br>Matchs
+</button>
+
+<button onclick="show('messages')">
+💬<br>Messages
+</button>
+
+<button onclick="show('profile');loadProfile()">
+👤<br>Profil
+</button>
+
 </div>
 
 </div>
 
 <script>
-const SUPABASE_URL="https://sttmiacttpkvzunlggog.supabase.co";
-const SUPABASE_KEY="sb_publishable_RKRc0ZugsLnIyFpuKz1org_Y0gxBNwq";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let user=null;
-let selectedMatch=null;
+const SUPABASE_URL =
+"https://sttmiacttpkvzunlggog.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_RKRc0ZugsLnIyFpuKz1org_Y0gxBNwq";
+
+const db =
+supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+let user = null;
+let selectedMatch = null;
+
+/* ================= UTILITAIRES ================= */
 
 function show(id){
- document.querySelectorAll("section").forEach(x=>x.classList.remove("active"));
- document.getElementById(id).classList.add("active");
+
+ document
+  .querySelectorAll("section")
+  .forEach(s =>
+   s.classList.remove("active")
+  );
+
+ document
+  .getElementById(id)
+  .classList.add("active");
 }
 
-async function signup(){
- const email=document.getElementById("email").value.trim();
- const password=document.getElementById("password").value;
- const first_name=document.getElementById("firstName").value.trim();
- const birth_date=document.getElementById("birthDate").value;
- const city=document.getElementById("city").value.trim();
+function escapeHtml(value){
 
- if(!email||!password||!first_name||!birth_date){
-  authMsg.textContent="Remplis tous les champs obligatoires.";
+ return String(value || "")
+  .replaceAll("&","&amp;")
+  .replaceAll("<","&lt;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
+  .replaceAll("'","&#039;");
+}
+
+function age(date){
+
+ if(!date) return "?";
+
+ const d = new Date(date);
+ const now = new Date();
+
+ let result =
+  now.getFullYear() -
+  d.getFullYear();
+
+ if(
+  now.getMonth() < d.getMonth() ||
+  (
+   now.getMonth() === d.getMonth() &&
+   now.getDate() < d.getDate()
+  )
+ ){
+  result--;
+ }
+
+ return result;
+}
+
+/* ================= INSCRIPTION ================= */
+
+async function signup(){
+
+ const email =
+  document.getElementById("email")
+  .value.trim();
+
+ const password =
+  document.getElementById("password")
+  .value;
+
+ const first_name =
+  document.getElementById("firstName")
+  .value.trim();
+
+ const birth_date =
+  document.getElementById("birthDate")
+  .value;
+
+ const city =
+  document.getElementById("city")
+  .value.trim();
+
+ const bio =
+  document.getElementById("bio")
+  .value.trim();
+
+ if(
+  !email ||
+  !password ||
+  !first_name ||
+  !birth_date
+ ){
+
+  authMsg.textContent =
+   "Remplis les champs obligatoires.";
+
   return;
  }
 
- const {data,error}=await db.auth.signUp({
+ const {
+  data,
+  error
+ } =
+ await db.auth.signUp({
+
   email,
   password,
-  options:{data:{first_name,birth_date}}
+
+  options:{
+   data:{
+    first_name,
+    birth_date
+   }
+  }
+
  });
 
  if(error){
-  authMsg.textContent=error.message;
+
+  authMsg.textContent =
+   error.message;
+
   return;
  }
 
  if(data.user){
-  await db.from("profiles").upsert({
-   id:data.user.id,
-   first_name,
-   birth_date,
-   city
-  });
+
+  const {
+   error:profileError
+  } =
+  await db
+   .from("profiles")
+   .upsert({
+
+    id:data.user.id,
+    first_name,
+    birth_date,
+    city,
+    bio
+
+   });
+
+  if(profileError){
+
+   authMsg.textContent =
+    profileError.message;
+
+   return;
+  }
  }
 
- authMsg.textContent="Compte créé. Vérifie ton email si nécessaire.";
+ authMsg.textContent =
+  "Compte créé. Vérifie ton email si nécessaire.";
 }
 
-async function login(){
- const email=document.getElementById("email").value.trim();
- const password=document.getElementById("password").value;
+/* ================= CONNEXION ================= */
 
- const {data,error}=await db.auth.signInWithPassword({email,password});
+async function login(){
+
+ const email =
+  document.getElementById("email")
+  .value.trim();
+
+ const password =
+  document.getElementById("password")
+  .value;
+
+ const {
+  data,
+  error
+ } =
+ await db.auth.signInWithPassword({
+
+  email,
+  password
+
+ });
 
  if(error){
-  authMsg.textContent=error.message;
+
+  authMsg.textContent =
+   error.message;
+
   return;
  }
 
- user=data.user;
+ user = data.user;
+
  await startApp();
 }
 
+/* ================= DEMARRAGE ================= */
+
 async function startApp(){
- document.getElementById("auth").classList.remove("active");
- document.getElementById("nav").style.display="flex";
+
+ document
+  .getElementById("auth")
+  .classList.remove("active");
+
+ document
+  .getElementById("nav")
+  .style.display = "flex";
+
  show("discover");
+
  await loadProfiles();
 }
 
+/* ================= PROFILS ================= */
+
 async function loadProfiles(){
- const {data,error}=await db
+
+ profiles.innerHTML =
+  "<p>Chargement...</p>";
+
+ const {
+  data,
+  error
+ } =
+ await db
   .from("profiles")
   .select("*")
   .neq("id",user.id)
-  .limit(20);
+  .limit(30);
 
  if(error){
-  profiles.innerHTML="<p>Erreur de chargement.</p>";
+
+  profiles.innerHTML =
+   "<p>Erreur de chargement.</p>";
+
   return;
  }
 
- if(!data.length){
-  profiles.innerHTML="<p>Aucun profil disponible pour le moment.</p>";
+ if(!data || !data.length){
+
+  profiles.innerHTML =
+   "<p>Aucun profil disponible.</p>";
+
   return;
  }
 
- profiles.innerHTML=data.map(p=>`
+ const visible = [];
+
+ for(const profile of data){
+
+  const {
+   data:blocked
+  } =
+  await db.rpc(
+   "is_blocked",
+   {
+    viewer:user.id,
+    target:profile.id
+   }
+  );
+
+  if(!blocked){
+
+   visible.push(profile);
+  }
+ }
+
+ if(!visible.length){
+
+  profiles.innerHTML =
+   "<p>Aucun nouveau profil.</p>";
+
+  return;
+ }
+
+ profiles.innerHTML =
+ visible.map(profile => `
+
  <div class="card">
-  <h2>${escapeHtml(p.first_name)}, ${age(p.birth_date)}</h2>
-  <p>📍 ${escapeHtml(p.city||"")}</p>
-  <p>${escapeHtml(p.bio||"Pas encore de présentation.")}</p>
-  <button onclick="likeUser('${p.id}')">❤️ J'aime</button>
+
+  <div id="photo-${profile.id}"></div>
+
+  <h2>
+   ${escapeHtml(profile.first_name)},
+   ${age(profile.birth_date)}
+  </h2>
+
+  <p>
+   📍 ${escapeHtml(profile.city || "")}
+  </p>
+
+  <p>
+   ${escapeHtml(
+    profile.bio ||
+    "Pas encore de présentation."
+   )}
+  </p>
+
+  <p
+   id="compat-${profile.id}"
+   class="compat">
+   Compatibilité : calcul...
+  </p>
+
+  <button
+   onclick="likeUser('${profile.id}')">
+   ❤️ J'aime
+  </button>
+
+  <button
+   class="secondary"
+   onclick="blockUser('${profile.id}')">
+   🚫 Bloquer
+  </button>
+
+  <button
+   class="secondary"
+   onclick="reportUser('${profile.id}')">
+   ⚠️ Signaler
+  </button>
+
  </div>
+
  `).join("");
+
+ for(const profile of visible){
+
+  const score =
+   await getCompatibility(
+    profile.id
+   );
+
+  const compatibility =
+   document.getElementById(
+    "compat-"+profile.id
+   );
+
+  if(compatibility){
+
+   compatibility.textContent =
+    score > 0
+    ? "Compatibilité : "+score+" %"
+    : "Compatibilité : non disponible";
+  }
+
+  await loadProfilePhoto(
+   profile.id
+  );
+ }
 }
 
-async function likeUser(id){
- const {error}=await db.from("likes").insert({
-  from_user:user.id,
-  to_user:id
- });
+/* ================= PHOTO PROFIL ================= */
 
- if(error && !error.message.includes("duplicate")){
-  alert(error.message);
+async function loadProfilePhoto(profileId){
+
+ const {
+  data,
+  error
+ } =
+ await db
+  .from("profile_photos")
+  .select("*")
+  .eq("user_id",profileId)
+  .order("position")
+  .limit(1);
+
+ if(
+  error ||
+  !data ||
+  !data.length
+ ){
   return;
  }
 
- alert("Koeur envoyé ❤️");
+ const container =
+  document.getElementById(
+   "photo-"+profileId
+  );
+
+ if(!container)return;
+
+ container.innerHTML = `
+
+ <img
+  class="photo"
+  src="${escapeHtml(data[0].photo_url)}"
+  alt="Photo de profil">
+
+ `;
+}
+
+/* ================= UPLOAD PHOTO ================= */
+
+async function uploadPhoto(){
+
+ const input =
+  document.getElementById(
+   "photoFile"
+  );
+
+ const file =
+  input.files[0];
+
+ if(!file){
+
+  alert(
+   "Choisis une photo."
+  );
+
+  return;
+ }
+
+ if(
+  ![
+   "image/jpeg",
+   "image/png",
+   "image/webp"
+  ].includes(file.type)
+ ){
+
+  alert(
+   "Format accepté : JPG, PNG ou WebP."
+  );
+
+  return;
+ }
+
+ if(file.size > 5242880){
+
+  alert(
+   "La photo doit faire moins de 5 Mo."
+  );
+
+  return;
+ }
+
+ const extension =
+  file.name
+   .split(".")
+   .pop()
+   .toLowerCase();
+
+ const path =
+  user.id+
+  "/"+
+  Date.now()+
+  "."+
+  extension;
+
+ const {
+  error:uploadError
+ } =
+ await db.storage
+  .from("profile-photos")
+  .upload(
+   path,
+   file,
+   {
+    upsert:false,
+    contentType:file.type
+   }
+  );
+
+ if(uploadError){
+
+  alert(
+   "Erreur photo : "+
+   uploadError.message
+  );
+
+  return;
+ }
+
+ const {
+  data:url
+ } =
+ db.storage
+  .from("profile-photos")
+  .getPublicUrl(path);
+
+ const {
+  error:insertError
+ } =
+ await db
+  .from("profile_photos")
+  .insert({
+
+   user_id:user.id,
+   photo_url:url.publicUrl,
+   position:0
+
+  });
+
+ if(insertError){
+
+  alert(insertError.message);
+
+  return;
+ }
+
+ input.value = "";
+
+ alert(
+  "Photo ajoutée ❤️"
+ );
+
+ await loadProfile();
+}
+
+/* ================= LIKE ================= */
+
+async function likeUser(profileId){
+
+ const {
+  error
+ } =
+ await db
+  .from("likes")
+  .insert({
+
+   from_user:user.id,
+   to_user:profileId
+
+  });
+
+ if(
+  error &&
+  !error.message
+   .toLowerCase()
+   .includes("duplicate")
+ ){
+
+  alert(error.message);
+
+  return;
+ }
+
+ alert(
+  "Koeur envoyé ❤️"
+ );
 
  await loadMatches();
 }
 
+/* ================= MATCHS ================= */
+
 async function loadMatches(){
- const {data,error}=await db
+
+ const {
+  data,
+  error
+ } =
+ await db
   .from("matches")
   .select("*")
-  .or(`user_a.eq.${user.id},user_b.eq.${user.id}`);
+  .or(
+   "user_a.eq."+
+   user.id+
+   ",user_b.eq."+
+   user.id
+  );
 
  if(error){
-  matchesList.innerHTML="<p>Erreur.</p>";
+
+  matchesList.innerHTML =
+   "<p>Erreur de chargement.</p>";
+
   return;
  }
 
- if(!data.length){
-  matchesList.innerHTML="<p>Pas encore de match.</p>";
+ if(!data || !data.length){
+
+  matchesList.innerHTML =
+   "<p>Pas encore de match.</p>";
+
   return;
  }
 
- const ids=data.map(m=>m.user_a===user.id?m.user_b:m.user_a);
+ const ids =
+  data.map(match =>
+   match.user_a === user.id
+   ? match.user_b
+   : match.user_a
+  );
 
- const {data:profiles}=await db
+ const {
+  data:profilesData
+ } =
+ await db
   .from("profiles")
   .select("*")
   .in("id",ids);
 
- matchesList.innerHTML=(profiles||[]).map(p=>`
- <div class="card">
-  <h2>${escapeHtml(p.first_name)}</h2>
-  <p>💕 Vous vous êtes likés !</p>
-  <button onclick="openChat('${findMatch(data,p.id)?.id||""}')">💬 Message</button>
- </div>
- `).join("");
+ matchesList.innerHTML =
+ (profilesData || [])
+ .map(profile => {
+
+  const match =
+   data.find(item =>
+    item.user_a === profile.id ||
+    item.user_b === profile.id
+   );
+
+  if(!match)return "";
+
+  return `
+
+  <div class="card">
+
+   <h2>
+    💕 ${escapeHtml(
+     profile.first_name
+    )}
+   </h2>
+
+   <p>
+    Vous vous êtes likés mutuellement.
+   </p>
+
+   <button
+    onclick="openChat('${match.id}')">
+    💬 Message
+   </button>
+
+   <button
+    class="secondary"
+    onclick="blockUser('${profile.id}')">
+    🚫 Bloquer
+   </button>
+
+  </div>
+
+  `;
+
+ })
+ .join("");
 }
 
-function findMatch(list,id){
- return list.find(m=>m.user_a===id||m.user_b===id);
-}
+/* ================= MESSAGES ================= */
 
 async function openChat(matchId){
- selectedMatch=matchId;
+
+ selectedMatch =
+  matchId;
+
  show("messages");
+
  await loadMessages();
 }
 
 async function loadMessages(){
+
  if(!selectedMatch){
-  messagesList.innerHTML="<p>Sélectionne un match.</p>";
+
+  messagesList.innerHTML =
+   "<p>Sélectionne un match.</p>";
+
   return;
  }
 
- const {data,error}=await db
+ const {
+  data,
+  error
+ } =
+ await db
   .from("messages")
   .select("*")
-  .eq("match_id",selectedMatch)
-  .order("created_at",{ascending:true});
+  .eq(
+   "match_id",
+   selectedMatch
+  )
+  .order(
+   "created_at",
+   {
+    ascending:true
+   }
+  );
 
  if(error){
-  messagesList.textContent=error.message;
+
+  messagesList.textContent =
+   error.message;
+
   return;
  }
 
- messagesList.innerHTML=(data||[]).map(m=>`
- <div class="card">
-  <b>${m.sender_id===user.id?"Moi":"Match"}</b>
-  <p>${escapeHtml(m.content)}</p>
- </div>
+ messagesList.innerHTML =
+ (data || [])
+ .map(message => `
+
+  <div class="
+   message
+   ${
+    message.sender_id === user.id
+    ? "mine"
+    : ""
+   }
+  ">
+
+   <b>
+    ${
+     message.sender_id === user.id
+     ? "Moi"
+     : "Match"
+    }
+   </b>
+
+   <p>
+    ${escapeHtml(
+     message.content
+    )}
+   </p>
+
+  </div>
+
  `).join("");
 }
 
 async function sendMessage(){
+
  if(!selectedMatch)return;
 
- const input=document.getElementById("messageInput");
- const content=input.value.trim();
+ const input =
+  document.getElementById(
+   "messageInput"
+  );
+
+ const content =
+  input.value.trim();
 
  if(!content)return;
 
- const {error}=await db.from("messages").insert({
-  match_id:selectedMatch,
-  sender_id:user.id,
-  content
- });
+ const {
+  error
+ } =
+ await db
+  .from("messages")
+  .insert({
+
+   match_id:selectedMatch,
+   sender_id:user.id,
+   content
+
+  });
 
  if(error){
+
   alert(error.message);
+
   return;
  }
 
- input.value="";
+ input.value = "";
+
  await loadMessages();
 }
 
+/* ================= BLOCAGE ================= */
+
+async function blockUser(profileId){
+
+ if(!confirm(
+  "Bloquer cette personne ?"
+ ))return;
+
+ const {
+  error
+ } =
+ await db
+  .from("blocks")
+  .insert({
+
+   blocker_id:user.id,
+   blocked_id:profileId
+
+  });
+
+ if(error){
+
+  alert(error.message);
+
+  return;
+ }
+
+ alert(
+  "Profil bloqué."
+ );
+
+ await loadProfiles();
+ await loadMatches();
+}
+
+/* ================= SIGNALEMENT ================= */
+
+async function reportUser(profileId){
+
+ const reason =
+  prompt(
+   "Pourquoi veux-tu signaler ce profil ?"
+  );
+
+ if(!reason)return;
+
+ const {
+  error
+ } =
+ await db
+  .from("reports")
+  .insert({
+
+   reporter_id:user.id,
+   reported_id:profileId,
+   reason:reason
+
+  });
+
+ if(error){
+
+  alert(error.message);
+
+  return;
+ }
+
+ alert(
+  "Signalement envoyé."
+ );
+}
+
+/* ================= COMPATIBILITE ================= */
+
+async function getCompatibility(
+ profileId
+){
+
+ const {
+  data,
+  error
+ } =
+ await db.rpc(
+  "compatibility_score",
+  {
+   user1:user.id,
+   user2:profileId
+  }
+ );
+
+ if(error)return 0;
+
+ return data || 0;
+}
+
+/* ================= PROFIL ================= */
+
 async function loadProfile(){
- const {data,error}=await db
+
+ const {
+  data,
+  error
+ } =
+ await db
   .from("profiles")
   .select("*")
   .eq("id",user.id)
   .single();
 
- if(error)return;
+ if(error){
 
- myProfile.innerHTML=`
+  myProfile.innerHTML =
+   "<p>Erreur de profil.</p>";
+
+  return;
+ }
+
+ editCity.value =
+  data.city || "";
+
+ editBio.value =
+  data.bio || "";
+
+ const {
+  data:photos
+ } =
+ await db
+  .from("profile_photos")
+  .select("*")
+  .eq("user_id",user.id)
+  .order("position");
+
+ let photoHtml = "";
+
+ if(photos && photos.length){
+
+  photoHtml =
+   photos.map(photo => `
+
+    <img
+     class="photo"
+     src="${escapeHtml(
+      photo.photo_url
+     )}"
+     alt="Ma photo">
+
+   `).join("");
+ }
+
+ myProfile.innerHTML = `
+
  <div class="card">
-  <h2>${escapeHtml(data.first_name)}</h2>
-  <p>📍 ${escapeHtml(data.city||"")}</p>
-  <p>${escapeHtml(data.bio||"")}</p>
- </div>`;
+
+  ${photoHtml}
+
+  <h2>
+   ${escapeHtml(
+    data.first_name
+   )}
+  </h2>
+
+  <p>
+   🎂 ${age(data.birth_date)} ans
+  </p>
+
+  <p>
+   📍 ${escapeHtml(
+    data.city || ""
+   )}
+  </p>
+
+  <p>
+   ${escapeHtml(
+    data.bio || ""
+   )}
+  </p>
+
+ </div>
+
+ `;
 }
 
+/* ================= MODIFICATION ================= */
+
+async function updateProfile(){
+
+ const city =
+  document.getElementById(
+   "editCity"
+  ).value.trim();
+
+ const bio =
+  document.getElementById(
+   "editBio"
+  ).value.trim();
+
+ const {
+  error
+ } =
+ await db
+  .from("profiles")
+  .update({
+   city,
+   bio
+  })
+  .eq(
+   "id",
+   user.id
+  );
+
+ if(error){
+
+  alert(error.message);
+
+  return;
+ }
+
+ alert(
+  "Profil enregistré ✅"
+ );
+
+ await loadProfile();
+}
+
+/* ================= DECONNEXION ================= */
+
 async function logout(){
+
  await db.auth.signOut();
+
  location.reload();
 }
 
-function age(date){
- const d=new Date(date);
- const now=new Date();
- let a=now.getFullYear()-d.getFullYear();
- if(now.getMonth()<d.getMonth() ||
-   (now.getMonth()===d.getMonth()&&now.getDate()<d.getDate()))a--;
- return a;
-}
-
-function escapeHtml(value){
- return String(value||"")
- .replaceAll("&","&amp;")
- .replaceAll("<","&lt;")
- .replaceAll(">","&gt;")
- .replaceAll('"',"&quot;")
- .replaceAll("'","&#039;");
-}
+/* ================= SESSION ================= */
 
 (async()=>{
- const {data}=await db.auth.getSession();
+
+ const {
+  data
+ } =
+ await db.auth.getSession();
 
  if(data.session){
-  user=data.session.user;
+
+  user =
+   data.session.user;
+
   await startApp();
  }
+
 })();
-
-
-async function blockUser(profileId) {
-    if (!confirm("Bloquer cette personne ?")) return;
-
-    const { error } = await db
-        .from("blocks")
-        .insert({
-            blocker_id: user.id,
-            blocked_id: profileId
-        });
-
-    if (error) {
-        alert(error.message);
-        return;
-    }
-
-    alert("Profil bloqué.");
-    await loadProfiles();
-}
-
-async function reportUser(profileId) {
-    const reason = prompt("Pourquoi veux-tu signaler ce profil ?");
-    if (!reason) return;
-
-    const { error } = await db
-        .from("reports")
-        .insert({
-            reporter_id: user.id,
-            reported_id: profileId,
-            reason: reason
-        });
-
-    if (error) {
-        alert(error.message);
-        return;
-    }
-
-    alert("Signalement envoyé.");
-}
-
-async function getCompatibility(profileId) {
-    const { data, error } = await db
-        .rpc("compatibility_score", {
-            user1: user.id,
-            user2: profileId
-        });
-
-    if (error) return 0;
-    return data || 0;
-}
 
 </script>
 
