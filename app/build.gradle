@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'com.koeur.app'
-    compileSdk 23
+    compileSdk 35
 
     defaultConfig {
         applicationId 'com.koeur.app'
         minSdk 23
-        targetSdk 23
+        targetSdk 35
         versionCode 1
         versionName '1.0'
     }
