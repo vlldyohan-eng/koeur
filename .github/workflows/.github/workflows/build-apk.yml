@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - main
+
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -12,38 +16,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: 📥 Récupérer le projet
         uses: actions/checkout@v5
 
-      - name: Installer Java 17
+      - name: ☕ Installer Java 17
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Donner les permissions à Gradle
-        run: chmod +x ./gradlew
-
-      - name: Vérifier Gradle
-        run: ./gradlew --version
-
-      - name: Nettoyer
-        run: ./gradlew clean --no-daemon
-
-      - name: Compiler Koeur
-        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon
-
-      - name: Vérifier l'APK
+      - name: 🔧 Préparer Gradle
         run: |
-          if [ ! -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
-            echo "❌ APK introuvable"
+          chmod +x ./gradlew
+          ./gradlew --version
+
+      - name: 🧹 Nettoyer le projet
+        run: |
+          ./gradlew clean --no-daemon
+
+      - name: 🔨 Compiler Koeur
+        run: |
+          ./gradlew :app:assembleDebug \
+            --stacktrace \
+            --no-daemon
+
+      - name: 🔍 Vérifier l'APK
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+
+          if [ ! -f "$APK" ]; then
+            echo "❌ APK introuvable : $APK"
             exit 1
           fi
 
           echo "✅ APK créé avec succès"
-          ls -lh app/build/outputs/apk/debug/app-debug.apk
+          ls -lh "$APK"
 
-      - name: Publier l'APK
+      - name: 📦 Publier l'APK
         uses: actions/upload-artifact@v4
         with:
           name: koeur-debug-apk
