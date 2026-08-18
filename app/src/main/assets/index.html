@@ -197,6 +197,94 @@ Chargement...
 
 <!-- ================= PROFIL ================= -->
 
+
+<section id="verification">
+
+<h1>🤖 Vérification IA</h1>
+
+<div class="card">
+
+<h2>Photo de profil</h2>
+
+<p class="small">
+L'analyse vérifie uniquement des éléments techniques
+de la photo. Elle ne confirme pas l'identité réelle
+d'une personne et ne garantit pas qu'une photo est authentique.
+</p>
+
+<input
+ id="aiPhotoFile"
+ type="file"
+ accept="image/jpeg,image/png,image/webp">
+
+<button onclick="analyzePhotoAI()">
+🔎 Analyser ma photo
+</button>
+
+<div id="aiPhotoResult"></div>
+
+</div>
+
+<div class="card">
+
+<h2>🐾 Mon animal totem</h2>
+
+<p class="small">
+Un résultat symbolique et ludique basé sur les informations
+que tu choisis de partager.
+</p>
+
+<button onclick="generateTotem()">
+✨ Trouver mon animal totem
+</button>
+
+<div id="totemResult"></div>
+
+</div>
+
+</section>
+
+
+<section id="alchemy">
+
+<h1>⚗️ Alchimie</h1>
+
+<div class="card">
+
+<h2>🔮 Mon profil alchimique</h2>
+
+<p>
+L'alchimie présentée ici est symbolique :
+elle sert à explorer les affinités de personnalité
+et ne constitue pas une analyse scientifique.
+</p>
+
+<button onclick="loadMyAlchemy()">
+✨ Découvrir mon profil
+</button>
+
+<div id="myAlchemy"></div>
+
+</div>
+
+<div class="card">
+
+<h2>💕 Alchimie entre deux personnes</h2>
+
+<p class="small">
+Sélectionne un match pour découvrir votre alchimie symbolique.
+</p>
+
+<div id="alchemyMatches">
+Chargement...
+</div>
+
+<div id="coupleAlchemy"></div>
+
+</div>
+
+</section>
+
 <section id="profile">
 
 <h1>Mon profil 👤</h1>
@@ -294,6 +382,14 @@ Se déconnecter
 💬<br>Messages
 </button>
 
+<button onclick="show('verification');loadVerification()">
+🤖<br>IA
+</button>
+
+<button onclick="show('alchemy');loadAlchemy()">
+⚗️<br>Alchimie
+</button>
+
 <button onclick="show('profile');loadProfile()">
 👤<br>Profil
 </button>
@@ -303,6 +399,91 @@ Se déconnecter
 </div>
 
 <script>
+
+
+const TOTEMS = {
+
+ wolf:{
+  name:"Loup",
+  emoji:"🐺",
+  element:"Air",
+  quality:"Loyauté et esprit de meute",
+  description:"Symbolise l'instinct, la fidélité et la force du lien."
+ },
+
+ lion:{
+  name:"Lion",
+  emoji:"🦁",
+  element:"Feu",
+  quality:"Courage et leadership",
+  description:"Symbolise l'assurance, la générosité et la volonté."
+ },
+
+ owl:{
+  name:"Hibou",
+  emoji:"🦉",
+  element:"Air",
+  quality:"Intuition et observation",
+  description:"Symbolise la réflexion, la curiosité et la sagesse."
+ },
+
+ fox:{
+  name:"Renard",
+  emoji:"🦊",
+  element:"Feu",
+  quality:"Adaptation et intelligence",
+  description:"Symbolise la créativité, la souplesse et la malice."
+ },
+
+ bear:{
+  name:"Ours",
+  emoji:"🐻",
+  element:"Terre",
+  quality:"Protection et stabilité",
+  description:"Symbolise la force tranquille, la protection et l'ancrage."
+ },
+
+ eagle:{
+  name:"Aigle",
+  emoji:"🦅",
+  element:"Air",
+  quality:"Vision et indépendance",
+  description:"Symbolise l'ambition, la liberté et la vision."
+ },
+
+ dolphin:{
+  name:"Dauphin",
+  emoji:"🐬",
+  element:"Eau",
+  quality:"Communication et sociabilité",
+  description:"Symbolise la joie, l'empathie et la communication."
+ },
+
+ butterfly:{
+  name:"Papillon",
+  emoji:"🦋",
+  element:"Air",
+  quality:"Transformation",
+  description:"Symbolise l'évolution, la liberté et le renouveau."
+ },
+
+ deer:{
+  name:"Cerf",
+  emoji:"🦌",
+  element:"Terre",
+  quality:"Sensibilité et douceur",
+  description:"Symbolise la sensibilité, la présence et la délicatesse."
+ },
+
+ raven:{
+  name:"Corbeau",
+  emoji:"🐦‍⬛",
+  element:"Air",
+  quality:"Mystère et imagination",
+  description:"Symbolise l'intuition, la créativité et le mystère."
+ }
+
+};
 
 const SUPABASE_URL =
 "https://sttmiacttpkvzunlggog.supabase.co";
@@ -358,7 +539,28 @@ function formatGender(gender){
  return "Non renseigné";
 }
 
+function getSearchBadge(category){
 
+ if(category === "serious")
+  return "❤️ Relation sérieuse";
+
+ if(category === "casual")
+  return "🔥 Sans engagement";
+
+ if(category === "friendship")
+  return "🤝 Amitié";
+
+ if(category === "dating")
+  return "💕 Faire connaissance";
+
+ if(category === "long_term")
+  return "💍 Relation durable";
+
+ if(category === "open")
+  return "🌈 Relation ouverte";
+
+ return "🔎 Recherche non renseignée";
+}
 
 function isAdult(date){
 
@@ -618,6 +820,7 @@ async function startApp(){
  show("discover");
 
  await loadProfiles();
+ await loadAlchemy();
 }
 
 /* ================= PROFILS ================= */
@@ -703,6 +906,12 @@ async function loadProfiles(){
 
 <p>
    💕 ${formatRelationship(profile.relationship_status)}
+</p>
+
+<p>
+   🏷️ <strong>
+   ${getSearchBadge(profile.search_category)}
+   </strong>
 </p>
 
 <button
@@ -812,6 +1021,470 @@ async function loadProfilePhoto(profileId){
 }
 
 /* ================= UPLOAD PHOTO ================= */
+
+
+
+
+
+async function loadAlchemy(){
+
+ const container =
+  document.getElementById(
+   "alchemyMatches"
+  );
+
+ const {
+  data,
+  error
+ } =
+ await db
+  .from("matches")
+  .select("*")
+  .or(
+   "user_a.eq."+user.id+
+   ",user_b.eq."+user.id
+  );
+
+ if(error || !data || !data.length){
+
+  container.innerHTML =
+   "<p>Aucun match pour le moment.</p>";
+
+  return;
+ }
+
+ const ids =
+  data.map(m =>
+   m.user_a === user.id
+   ? m.user_b
+   : m.user_a
+  );
+
+ const {
+  data:people
+ } =
+ await db
+  .from("profiles")
+  .select("id,first_name")
+  .in("id",ids);
+
+ container.innerHTML =
+ (people || [])
+ .map(person => `
+
+  <button
+   class="secondary"
+   onclick="calculateAlchemy('${person.id}')">
+
+   ⚗️ Alchimie avec
+   ${escapeHtml(person.first_name)}
+
+  </button>
+
+ `).join("");
+}
+
+async function calculateAlchemy(otherId){
+
+ const result =
+  document.getElementById(
+   "coupleAlchemy"
+  );
+
+ const {
+  data:me
+ } =
+ await db
+  .from("profiles")
+  .select(
+   "search_category,relationship_status,gender"
+  )
+  .eq("id",user.id)
+  .single();
+
+ const {
+  data:other
+ } =
+ await db
+  .from("profiles")
+  .select(
+   "search_category,relationship_status,gender,first_name"
+  )
+  .eq("id",otherId)
+  .single();
+
+ if(!me || !other){
+
+  result.innerHTML =
+   "<p>Impossible de calculer l'alchimie.</p>";
+
+  return;
+ }
+
+ let score = 50;
+
+ if(
+  me.search_category &&
+  other.search_category &&
+  me.search_category === other.search_category
+ ){
+  score += 20;
+ }
+
+ if(
+  me.relationship_status &&
+  other.relationship_status &&
+  me.relationship_status === other.relationship_status
+ ){
+  score += 10;
+ }
+
+ score +=
+  Math.floor(
+   Math.random() * 21
+  ) - 10;
+
+ score =
+  Math.max(
+   0,
+   Math.min(
+    100,
+    score
+   )
+  );
+
+ let title =
+  "Alchimie à explorer";
+
+ if(score >= 80)
+  title = "✨ Très forte alchimie symbolique";
+
+ else if(score >= 60)
+  title = "💕 Belle alchimie";
+
+ else if(score >= 40)
+  title = "🔮 Alchimie intéressante";
+
+ else
+  title = "🌙 Alchimie à découvrir";
+
+ result.innerHTML = `
+
+ <div class="card">
+
+  <h2>
+   ${title}
+  </h2>
+
+  <div style="font-size:40px">
+   ⚗️ + 💕
+  </div>
+
+  <h1>
+   ${score}%
+  </h1>
+
+  <p>
+   Profil de ${escapeHtml(
+    other.first_name
+   )}
+  </p>
+
+  <p>
+   Cette compatibilité est une lecture
+   symbolique basée sur les informations
+   déclarées dans les profils.
+  </p>
+
+  <p class="small">
+   Ce score ne prédit pas la réussite d'une relation
+   et ne constitue pas une analyse psychologique.
+  </p>
+
+ </div>
+
+ `;
+
+ try{
+
+  await db
+   .from("alchemy_results")
+   .insert({
+
+    user_a:user.id,
+    user_b:otherId,
+    score:score
+
+   });
+
+ }catch(e){
+
+  console.log(
+   "Historique alchimie non enregistré"
+  );
+ }
+}
+
+async function loadMyAlchemy(){
+
+ const result =
+  document.getElementById(
+   "myAlchemy"
+  );
+
+ const {
+  data,
+  error
+ } =
+ await db
+  .from("profiles")
+  .select(
+   "first_name,gender,looking_for,relationship_status,search_category"
+  )
+  .eq("id",user.id)
+  .single();
+
+ if(error){
+
+  result.innerHTML =
+   "<p>Profil indisponible.</p>";
+
+  return;
+ }
+
+ let element =
+  "Éther";
+
+ if(data.search_category === "serious" ||
+    data.search_category === "long_term"){
+  element = "Terre";
+ }
+
+ if(data.search_category === "casual" ||
+    data.search_category === "open"){
+  element = "Feu";
+ }
+
+ if(data.search_category === "friendship"){
+  element = "Air";
+ }
+
+ if(data.search_category === "dating"){
+  element = "Eau";
+ }
+
+ result.innerHTML = `
+
+ <div class="card">
+
+  <h3>⚗️ Ton profil symbolique</h3>
+
+  <p>
+   <strong>Élément dominant :</strong>
+   ${element}
+  </p>
+
+  <p>
+   <strong>Recherche :</strong>
+   ${getSearchBadge(data.search_category)}
+  </p>
+
+  <p>
+   <strong>Statut :</strong>
+   ${formatRelationship(
+    data.relationship_status
+   )}
+  </p>
+
+  <p class="small">
+   Cette lecture est symbolique et destinée au divertissement.
+  </p>
+
+ </div>
+
+ `;
+}
+
+async function generateTotem(){
+
+ const keys =
+  Object.keys(TOTEMS);
+
+ const index =
+  Math.floor(
+   Math.random() * keys.length
+  );
+
+ const totem =
+  TOTEMS[keys[index]];
+
+ const result =
+  document.getElementById(
+   "totemResult"
+  );
+
+ result.innerHTML = `
+
+ <div class="card">
+
+  <div style="font-size:70px">
+   ${totem.emoji}
+  </div>
+
+  <h2>
+   ${totem.name}
+  </h2>
+
+  <p>
+   <strong>Élément :</strong>
+   ${totem.element}
+  </p>
+
+  <p>
+   <strong>Qualité :</strong>
+   ${totem.quality}
+  </p>
+
+  <p>
+   ${totem.description}
+  </p>
+
+  <p class="small">
+   Résultat symbolique et ludique.
+  </p>
+
+ </div>
+
+ `;
+
+ try{
+
+  await db
+   .from("totem_results")
+   .insert({
+    user_id:user.id,
+    totem_code:keys[index]
+   });
+
+ }catch(e){
+
+  console.log(
+   "Historique totem non enregistré"
+  );
+ }
+}
+
+async function analyzePhotoAI(){
+
+ const input =
+  document.getElementById("aiPhotoFile");
+
+ const file =
+  input.files[0];
+
+ const result =
+  document.getElementById("aiPhotoResult");
+
+ if(!file){
+
+  result.innerHTML =
+   "<p>Choisis une photo.</p>";
+
+  return;
+ }
+
+ if(!file.type.startsWith("image/")){
+
+  result.innerHTML =
+   "<p>Format image requis.</p>";
+
+  return;
+ }
+
+ if(file.size > 5 * 1024 * 1024){
+
+  result.innerHTML =
+   "<p>La photo doit faire moins de 5 Mo.</p>";
+
+  return;
+ }
+
+ result.innerHTML =
+  "<p>🔎 Analyse technique en cours...</p>";
+
+ const image =
+  new Image();
+
+ const url =
+  URL.createObjectURL(file);
+
+ image.onload = async function(){
+
+  const width =
+   image.naturalWidth;
+
+  const height =
+   image.naturalHeight;
+
+  const ratio =
+   width / height;
+
+  const quality =
+   width >= 800 &&
+   height >= 800
+   ? "Bonne résolution"
+   : "Résolution faible";
+
+  let framing =
+   "Format équilibré";
+
+  if(ratio > 1.8)
+   framing = "Photo très horizontale";
+
+  if(ratio < 0.55)
+   framing = "Photo très verticale";
+
+  result.innerHTML = `
+
+  <div class="card">
+
+   <h3>🤖 Analyse terminée</h3>
+
+   <p>📐 Résolution :
+   ${width} × ${height}</p>
+
+   <p>🖼️ Cadrage :
+   ${framing}</p>
+
+   <p>✨ Qualité :
+   ${quality}</p>
+
+   <p>🔐 Analyse :
+   <strong>indicateurs techniques uniquement</strong>
+   </p>
+
+   <p class="small">
+   Cette analyse ne vérifie pas l'identité de la personne
+   et ne peut pas déterminer avec certitude si une photo
+   est authentique ou générée par IA.
+   </p>
+
+  </div>
+
+  `;
+
+  URL.revokeObjectURL(url);
+ };
+
+ image.onerror = function(){
+
+  result.innerHTML =
+   "<p>Impossible de lire cette image.</p>";
+
+ };
+
+ image.src = url;
+}
 
 async function uploadPhoto(){
 
@@ -1402,6 +2075,8 @@ async function updateProfile(){
  await db
   .from("profiles")
   .update({
+   relationship_status,
+   search_category,
    city,
    bio
   })
