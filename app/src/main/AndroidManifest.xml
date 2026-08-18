@@ -1,6 +1,6 @@
 <application
     android:allowBackup="true"
-    android:label="Koeur"
+    android:label="Koeur" android:icon="@drawable/koeur_logo"
     android:icon="@drawable/koeur_logo"
     android:theme="@style/AppTheme"
     android:usesCleartextTraffic="true">
