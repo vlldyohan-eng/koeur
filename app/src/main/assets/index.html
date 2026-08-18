@@ -132,6 +132,7 @@ button{
 <input id="password" type="password" placeholder="Mot de passe">
 <input id="firstName" placeholder="Prénom">
 <input id="birthDate" type="date">
+<p id="ageError" class="small" style="color:#d00;font-weight:bold"></p>
 
 <select id="gender">
 <option value="">Genre</option>
@@ -230,6 +231,17 @@ Chargement...
 <option value="female">Une femme</option>
 <option value="non_binary">Une personne non-binaire</option>
 <option value="all">Tout le monde</option>
+</select>
+
+
+<select id="editSearchCategory">
+<option value="">Type de recherche</option>
+<option value="serious">❤️ Relation sérieuse</option>
+<option value="casual">🔥 Rencontre sans engagement</option>
+<option value="friendship">🤝 Amitié</option>
+<option value="dating">💕 Faire connaissance</option>
+<option value="long_term">💍 Relation durable</option>
+<option value="open">🌈 Relation ouverte</option>
 </select>
 
 <select id="editRelationshipStatus">
@@ -347,6 +359,35 @@ function formatGender(gender){
 }
 
 
+
+function isAdult(date){
+
+ if(!date) return false;
+
+ const birth = new Date(date);
+ const today = new Date();
+
+ let years =
+  today.getFullYear() -
+  birth.getFullYear();
+
+ const month =
+  today.getMonth() -
+  birth.getMonth();
+
+ if(
+  month < 0 ||
+  (
+   month === 0 &&
+   today.getDate() < birth.getDate()
+  )
+ ){
+  years--;
+ }
+
+ return years >= 18;
+}
+
 function age(date){
 
  if(!date) return "?";
@@ -391,6 +432,16 @@ async function signup(){
   document.getElementById("birthDate")
   .value;
 
+ if(!isAdult(birth_date)){
+
+  document.getElementById("ageError").textContent =
+   "Koeur est réservé aux personnes âgées de 18 ans ou plus.";
+
+  return;
+}
+
+document.getElementById("ageError").textContent = "";
+
  const gender =
   document.getElementById("gender").value;
 
@@ -399,6 +450,9 @@ async function signup(){
 
  const relationship_status =
   document.getElementById("relationshipStatus").value;
+
+ const search_category =
+  document.getElementById("searchCategory").value;
 
  const city =
   document.getElementById("city")
@@ -462,6 +516,7 @@ async function signup(){
     gender,
     looking_for,
     relationship_status,
+    search_category,
     city,
     bio
 
@@ -513,10 +568,42 @@ async function login(){
 
  user = data.user;
 
+ if(!(await verifyAdultAccount())){
+  return;
+ }
+
  await startApp();
 }
 
 /* ================= DEMARRAGE ================= */
+
+
+async function verifyAdultAccount(){
+
+ const {
+  data,
+  error
+ } = await db
+  .from("profiles")
+  .select("birth_date")
+  .eq("id",user.id)
+  .single();
+
+ if(error || !data || !isAdult(data.birth_date)){
+
+  await db.auth.signOut();
+
+  alert(
+   "Koeur est réservé aux personnes âgées de 18 ans ou plus."
+  );
+
+  location.reload();
+
+  return false;
+ }
+
+ return true;
+}
 
 async function startApp(){
 
@@ -1215,6 +1302,9 @@ async function loadProfile(){
  editRelationshipStatus.value =
   data.relationship_status || "";
 
+ editSearchCategory.value =
+  data.search_category || "";
+
  editCity.value =
   data.city || "";
 
@@ -1292,6 +1382,9 @@ async function updateProfile(){
 
  const relationship_status =
   document.getElementById("editRelationshipStatus").value;
+
+ const search_category =
+  document.getElementById("editSearchCategory").value;
 
  const city =
   document.getElementById(
