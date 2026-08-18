@@ -217,6 +217,30 @@ Chargement...
 <option value="all">Tout le monde</option>
 </select>
 
+<select id="editGender">
+<option value="">Genre</option>
+<option value="male">Homme</option>
+<option value="female">Femme</option>
+<option value="non_binary">Non-binaire</option>
+</select>
+
+<select id="editLookingFor">
+<option value="">Je recherche...</option>
+<option value="male">Un homme</option>
+<option value="female">Une femme</option>
+<option value="non_binary">Une personne non-binaire</option>
+<option value="all">Tout le monde</option>
+</select>
+
+<select id="editRelationshipStatus">
+<option value="">Situation sentimentale</option>
+<option value="single">Célibataire</option>
+<option value="relationship">En couple</option>
+<option value="married">Marié(e)</option>
+<option value="complicated">Relation compliquée</option>
+<option value="open_relationship">Relation ouverte</option>
+</select>
+
 <input id="editCity" placeholder="Ville">
 
 <textarea id="editBio" placeholder="Présentation"></textarea>
@@ -367,6 +391,15 @@ async function signup(){
   document.getElementById("birthDate")
   .value;
 
+ const gender =
+  document.getElementById("gender").value;
+
+ const looking_for =
+  document.getElementById("lookingFor").value;
+
+ const relationship_status =
+  document.getElementById("relationshipStatus").value;
+
  const city =
   document.getElementById("city")
   .value.trim();
@@ -426,6 +459,9 @@ async function signup(){
     id:data.user.id,
     first_name,
     birth_date,
+    gender,
+    looking_for,
+    relationship_status,
     city,
     bio
 
@@ -574,6 +610,19 @@ async function loadProfiles(){
   <p>
    📍 ${escapeHtml(profile.city || "")}
   </p>
+<p>
+   ⚧️ ${formatGender(profile.gender)}
+</p>
+
+<p>
+   💕 ${formatRelationship(profile.relationship_status)}
+</p>
+
+<button
+ class="secondary"
+ onclick="reportIntegrity('${profile.id}')">
+ ⚠️ Signaler une situation suspecte
+</button>
 
   <p>
    ${escapeHtml(
@@ -1157,6 +1206,15 @@ async function loadProfile(){
   return;
  }
 
+ editGender.value =
+  data.gender || "";
+
+ editLookingFor.value =
+  data.looking_for || "";
+
+ editRelationshipStatus.value =
+  data.relationship_status || "";
+
  editCity.value =
   data.city || "";
 
@@ -1226,6 +1284,15 @@ async function loadProfile(){
 
 async function updateProfile(){
 
+ const gender =
+  document.getElementById("editGender").value;
+
+ const looking_for =
+  document.getElementById("editLookingFor").value;
+
+ const relationship_status =
+  document.getElementById("editRelationshipStatus").value;
+
  const city =
   document.getElementById(
    "editCity"
@@ -1291,6 +1358,38 @@ async function logout(){
  }
 
 })();
+
+
+async function reportIntegrity(profileId){
+
+ const reason = prompt(
+  "Décris brièvement la situation suspecte :"
+ );
+
+ if(!reason || reason.trim().length < 5){
+  return;
+ }
+
+ const {
+  error
+ } = await db
+  .from("integrity_reports")
+  .insert({
+   reporter_id:user.id,
+   reported_id:profileId,
+   reason:reason.trim(),
+   evidence_description:null
+  });
+
+ if(error){
+  alert(error.message);
+  return;
+ }
+
+ alert(
+  "Signalement transmis à la modération."
+ );
+}
 
 </script>
 
