@@ -111,6 +111,40 @@ button{
  background:#ffe0ea;
  text-align:right
 }
+
+/* ===== KOEUR - INSCRIPTION MODERNE ===== */
+.auth-screen{min-height:calc(100vh - 70px);padding:18px 0 30px;background:radial-gradient(circle at top right,#ffe1eb 0%,transparent 42%),linear-gradient(180deg,#fff8fb,#fff)}
+.auth-container{max-width:460px;margin:auto}
+.auth-logo{text-align:center;margin:5px 0 15px}
+.heart-logo{width:64px;height:64px;margin:auto;border-radius:21px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ff3d78,#ff7198);color:#fff;font-size:34px;box-shadow:0 10px 26px rgba(255,61,120,.22)}
+.brand-name{margin-top:7px;font-size:27px;font-weight:900;color:#ff3d78}
+.auth-progress{height:7px;background:#eee7ea;border-radius:20px;overflow:hidden;margin:8px 0 5px}
+.auth-progress-bar{height:100%;width:25%;background:linear-gradient(90deg,#ff3d78,#ff7198);transition:width .25s}
+.auth-step-counter{text-align:right;color:#888;font-size:12px;margin-bottom:10px}
+.auth-step{display:none;animation:authFade .2s ease}.auth-step.active{display:block}
+@keyframes authFade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.auth-step h1{margin:18px 0 7px;font-size:27px;line-height:1.18}
+.auth-subtitle{margin:0 0 18px;color:#777;line-height:1.5;font-size:14px}
+.welcome-card{padding:22px;border-radius:22px;background:#fff;border:1px solid #f0e3e8;box-shadow:0 10px 28px rgba(35,20,28,.06);text-align:center;margin-bottom:16px}
+.welcome-icon{font-size:46px}.welcome-card h2{font-size:19px;margin:7px 0}.welcome-card p{color:#777;line-height:1.5;margin:0}
+.auth-label{display:block;margin:14px 0 6px;font-size:13px;font-weight:800}
+.auth-input-wrapper{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e4dde1;border-radius:15px;padding:0 13px}
+.auth-input-wrapper:focus-within{border-color:#ff3d78;box-shadow:0 0 0 4px rgba(255,61,120,.09)}
+.auth-input-wrapper input{border:0!important;outline:0!important;box-shadow:none!important;margin:0!important;padding:14px 0!important;background:transparent}
+.choice-grid,.relation-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.choice-button,.relation-button{border:1px solid #e4dde1;background:#fff;color:#34292f;border-radius:16px;padding:14px 9px;display:flex;align-items:center;justify-content:center;gap:7px;min-height:58px;cursor:pointer;margin:0}
+.choice-button.selected,.relation-button.selected{background:#fff0f4;border-color:#ff3d78;color:#d92d61}
+.relation-button{flex-direction:column;min-height:78px;font-size:13px;font-weight:700}
+.auth-navigation{display:flex;gap:9px;margin-top:18px}
+.back-button{width:35%;background:#f1edef;color:#44383e;border:0;border-radius:15px;font-weight:800;margin:0;cursor:pointer}
+.next-button,.create-account-button,.auth-main-button{flex:1;border:0;border-radius:15px;min-height:52px;background:linear-gradient(135deg,#ff3d78,#ff6590);color:#fff;font-weight:800;font-size:14px;box-shadow:0 8px 20px rgba(255,61,120,.2);cursor:pointer;margin:0}
+.auth-link-button{background:transparent;border:0;color:#ff3d78;font-weight:800;cursor:pointer;margin-top:5px}
+.auth-textarea{width:100%;min-height:110px;padding:14px;border:1px solid #e4dde1;border-radius:15px;resize:vertical;outline:0;font-family:inherit}
+.auth-message{text-align:center;min-height:20px;margin-top:10px;font-size:13px;font-weight:700}
+.auth-error{min-height:17px;color:#d92855;font-size:12px;font-weight:700;margin:5px 0}
+.bio-counter{text-align:right;color:#999;font-size:11px;margin-top:4px}
+@media(max-width:380px){.choice-grid,.relation-grid{grid-template-columns:1fr}.auth-step h1{font-size:24px}}
+
 </style>
 </head>
 
@@ -124,63 +158,81 @@ button{
 
 <!-- ================= AUTH ================= -->
 
-<section id="auth" class="active">
+<section id="auth" class="active auth-screen">
+<div class="auth-container">
+<div class="auth-logo"><div class="heart-logo">♥</div><div class="brand-name">Koeur</div></div>
+<div class="auth-progress"><div id="authProgressBar" class="auth-progress-bar"></div></div>
+<div class="auth-step-counter">Étape <span id="authStepNumber">1</span> sur 4</div>
 
-<div class="logo">♥</div>
+<div class="auth-step active" id="authStep1">
+<h1>Bienvenue sur Koeur 💕</h1>
+<p class="auth-subtitle">Créons ton profil en quelques étapes simples.</p>
+<div class="welcome-card"><div class="welcome-icon">💖</div><h2>Des rencontres qui ont du sens</h2><p>Découvre des personnes selon tes valeurs, tes attentes et tes affinités.</p></div>
+<button type="button" class="auth-main-button" onclick="nextAuthStep()">Commencer →</button>
+<button type="button" class="auth-link-button" onclick="login()">J'ai déjà un compte</button>
+</div>
 
-<h1>Bienvenue sur Koeur</h1>
+<div class="auth-step" id="authStep2">
+<h1>Faisons connaissance 👋</h1>
+<p class="auth-subtitle">Ces informations permettent de construire ton profil.</p>
+<label class="auth-label">Ton prénom</label>
+<div class="auth-input-wrapper"><span>👤</span><input id="firstName" type="text" placeholder="Ex. Yohan" autocomplete="given-name"></div>
+<label class="auth-label">Ta date de naissance</label>
+<div class="auth-input-wrapper"><span>🎂</span><input id="birthDate" type="date"></div>
+<p id="ageError" class="auth-error"></p>
+<label class="auth-label">Ton genre</label>
+<div class="choice-grid">
+<button type="button" class="choice-button" data-value="male" onclick="selectAuthChoice(this,'gender')">👨 <span>Homme</span></button>
+<button type="button" class="choice-button" data-value="female" onclick="selectAuthChoice(this,'gender')">👩 <span>Femme</span></button>
+<button type="button" class="choice-button" data-value="non_binary" onclick="selectAuthChoice(this,'gender')">🧑 <span>Non-binaire</span></button>
+</div>
+<input type="hidden" id="gender">
+<div class="auth-navigation"><button type="button" class="back-button" onclick="previousAuthStep()">← Retour</button><button type="button" class="next-button" onclick="nextAuthStep()">Continuer →</button></div>
+</div>
 
-<p>Des rencontres basées sur les valeurs et la compatibilité.</p>
+<div class="auth-step" id="authStep3">
+<h1>Que recherches-tu ? 💕</h1>
+<p class="auth-subtitle">Choisis ce qui correspond le mieux à tes attentes.</p>
+<label class="auth-label">Je recherche</label>
+<div class="choice-grid">
+<button type="button" class="choice-button" data-value="male" onclick="selectAuthChoice(this,'lookingFor')">👨 <span>Un homme</span></button>
+<button type="button" class="choice-button" data-value="female" onclick="selectAuthChoice(this,'lookingFor')">👩 <span>Une femme</span></button>
+<button type="button" class="choice-button" data-value="non_binary" onclick="selectAuthChoice(this,'lookingFor')">🧑 <span>Non-binaire</span></button>
+<button type="button" class="choice-button" data-value="all" onclick="selectAuthChoice(this,'lookingFor')">💕 <span>Tout le monde</span></button>
+</div>
+<input type="hidden" id="lookingFor">
+<label class="auth-label">Type de recherche</label>
+<div class="relation-grid">
+<button type="button" class="relation-button" data-value="serious" onclick="selectAuthChoice(this,'searchCategory')">❤️ <span>Relation sérieuse</span></button>
+<button type="button" class="relation-button" data-value="dating" onclick="selectAuthChoice(this,'searchCategory')">💕 <span>Faire connaissance</span></button>
+<button type="button" class="relation-button" data-value="friendship" onclick="selectAuthChoice(this,'searchCategory')">🤝 <span>Amitié</span></button>
+<button type="button" class="relation-button" data-value="long_term" onclick="selectAuthChoice(this,'searchCategory')">💍 <span>Relation durable</span></button>
+<button type="button" class="relation-button" data-value="casual" onclick="selectAuthChoice(this,'searchCategory')">🔥 <span>Sans engagement</span></button>
+<button type="button" class="relation-button" data-value="open" onclick="selectAuthChoice(this,'searchCategory')">🌈 <span>Relation ouverte</span></button>
+</div>
+<input type="hidden" id="searchCategory">
+<label class="auth-label">Situation sentimentale</label>
+<select id="relationshipStatus"><option value="">Choisir...</option><option value="single">Célibataire</option><option value="relationship">En couple</option><option value="married">Marié(e)</option><option value="complicated">Relation compliquée</option><option value="open_relationship">Relation ouverte</option></select>
+<div class="auth-navigation"><button type="button" class="back-button" onclick="previousAuthStep()">← Retour</button><button type="button" class="next-button" onclick="nextAuthStep()">Continuer →</button></div>
+</div>
 
-<input id="email" type="email" placeholder="Email">
-<input id="password" type="password" placeholder="Mot de passe">
-<input id="firstName" placeholder="Prénom">
-<input id="birthDate" type="date">
-<p id="ageError" class="small" style="color:#d00;font-weight:bold"></p>
-
-<select id="gender">
-<option value="">Genre</option>
-<option value="male">Homme</option>
-<option value="female">Femme</option>
-<option value="non_binary">Non-binaire</option>
-</select>
-
-<select id="lookingFor">
-<option value="">Je recherche...</option>
-<option value="male">Un homme</option>
-<option value="female">Une femme</option>
-<option value="non_binary">Une personne non-binaire</option>
-<option value="all">Tout le monde</option>
-</select>
-
-
-<select id="relationshipStatus">
-<option value="">Situation sentimentale</option>
-<option value="single">Célibataire</option>
-<option value="relationship">En couple</option>
-<option value="married">Marié(e)</option>
-<option value="complicated">Relation compliquée</option>
-<option value="open_relationship">Relation ouverte</option>
-</select>
-
-<select id="searchCategory">
-<option value="">Type de recherche</option>
-<option value="serious">❤️ Relation sérieuse</option>
-<option value="casual">🔥 Sans engagement</option>
-<option value="friendship">🤝 Amitié</option>
-<option value="dating">💕 Faire connaissance</option>
-<option value="long_term">💍 Relation durable</option>
-<option value="open">🌈 Relation ouverte</option>
-</select>
-
-<input id="city" placeholder="Ville">
-<textarea id="bio" placeholder="Présente-toi"></textarea>
-
-<button onclick="signup()">Créer mon compte</button>
-<button class="secondary" onclick="login()">Se connecter</button>
-
-<p id="authMsg" class="small"></p>
-
+<div class="auth-step" id="authStep4">
+<h1>Dernière étape ✨</h1>
+<p class="auth-subtitle">Sécurise ton compte et ajoute une présentation.</p>
+<label class="auth-label">Ton email</label>
+<div class="auth-input-wrapper"><span>✉️</span><input id="email" type="email" placeholder="ton@email.com" autocomplete="email"></div>
+<label class="auth-label">Mot de passe</label>
+<div class="auth-input-wrapper"><span>🔒</span><input id="password" type="password" placeholder="Minimum 6 caractères" autocomplete="new-password"></div>
+<label class="auth-label">Ta ville</label>
+<div class="auth-input-wrapper"><span>📍</span><input id="city" type="text" placeholder="Ex. Autun"></div>
+<label class="auth-label">Ta présentation</label>
+<textarea id="bio" class="auth-textarea" maxlength="500" placeholder="Quelques mots sur toi..."></textarea>
+<div class="bio-counter">500 caractères maximum</div>
+<div id="authMsg" class="auth-message"></div>
+<div class="auth-navigation"><button type="button" class="back-button" onclick="previousAuthStep()">← Retour</button><button type="button" class="create-account-button" onclick="signup()">💕 Créer mon compte</button></div>
+<button type="button" class="auth-link-button" onclick="login()">J'ai déjà un compte</button>
+</div>
+</div>
 </section>
 
 <!-- ================= DECOUVRIR ================= -->
@@ -1351,7 +1403,7 @@ async function loadDeveloperData(){
 
 
     const {
-        data:payments
+        data:paymentRows
     } =
     await db
         .from("premium_payments")
@@ -1370,7 +1422,7 @@ async function loadDeveloperData(){
     if(payments){
 
         payments.innerHTML =
-            (payments || [])
+            (paymentRows || [])
             .map(payment => `
 
                 <div class="card">
@@ -1502,6 +1554,54 @@ function age(date){
 }
 
 /* ================= INSCRIPTION ================= */
+
+
+/* ===== INSCRIPTION KOEUR - NAVIGATION ===== */
+let authStep = 1;
+const AUTH_TOTAL_STEPS = 4;
+
+function updateAuthStep(){
+    for(let i=1;i<=AUTH_TOTAL_STEPS;i++){
+        const step=document.getElementById("authStep"+i);
+        if(step) step.classList.toggle("active",i===authStep);
+    }
+    const bar=document.getElementById("authProgressBar");
+    if(bar) bar.style.width=((authStep/AUTH_TOTAL_STEPS)*100)+"%";
+    const n=document.getElementById("authStepNumber");
+    if(n) n.textContent=authStep;
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function validateAuthStep(){
+    if(authStep===2){
+        const first=document.getElementById("firstName")?.value.trim();
+        const birth=document.getElementById("birthDate")?.value;
+        const gender=document.getElementById("gender")?.value;
+        if(!first){alert("Indique ton prénom pour continuer.");return false;}
+        if(!birth || (typeof isAdult==="function" && !isAdult(birth))){
+            const e=document.getElementById("ageError");
+            if(e)e.textContent="Koeur est réservé aux personnes de 18 ans ou plus.";
+            return false;
+        }
+        if(!gender){alert("Sélectionne ton genre.");return false;}
+    }
+    if(authStep===3){
+        if(!document.getElementById("lookingFor")?.value){alert("Indique qui tu recherches.");return false;}
+        if(!document.getElementById("searchCategory")?.value){alert("Choisis ton type de recherche.");return false;}
+        if(!document.getElementById("relationshipStatus")?.value){alert("Choisis ta situation sentimentale.");return false;}
+    }
+    return true;
+}
+
+function nextAuthStep(){if(validateAuthStep()&&authStep<AUTH_TOTAL_STEPS){authStep++;updateAuthStep();}}
+function previousAuthStep(){if(authStep>1){authStep--;updateAuthStep();}}
+function selectAuthChoice(button,inputId){
+    button.parentElement.querySelectorAll(".selected").forEach(x=>x.classList.remove("selected"));
+    button.classList.add("selected");
+    const input=document.getElementById(inputId);
+    if(input)input.value=button.dataset.value;
+}
+document.addEventListener("DOMContentLoaded",function(){updateAuthStep();});
 
 async function signup(){
 
