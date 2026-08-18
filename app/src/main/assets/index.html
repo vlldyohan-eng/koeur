@@ -352,6 +352,38 @@ que tu souhaites développer aujourd'hui.
 
 </section>
 
+
+<section id="personality">
+
+<h1>🧠 Mon bilan</h1>
+
+<div class="card">
+
+<h2>✨ Analyse personnelle</h2>
+
+<p>
+Réponds aux questions pour obtenir un bilan de tes
+préférences relationnelles, de ta communication,
+de tes attentes et de ton fonctionnement social.
+</p>
+
+<p class="small">
+Ce bilan est indicatif et non médical. Il ne constitue
+pas un diagnostic psychologique.
+</p>
+
+<div id="personalityQuestions"></div>
+
+<button onclick="calculatePersonality()">
+🧠 Générer mon bilan
+</button>
+
+<div id="personalityResult"></div>
+
+</div>
+
+</section>
+
 <section id="profile">
 
 <h1>Mon profil 👤</h1>
@@ -461,6 +493,10 @@ Se déconnecter
 🌹<br>Rose-Croix
 </button>
 
+<button onclick="show('personality');loadPersonality()">
+🧠<br>Personnalité
+</button>
+
 <button onclick="show('profile');loadProfile()">
 👤<br>Profil
 </button>
@@ -472,6 +508,111 @@ Se déconnecter
 <script>
 
 
+
+
+const PERSONALITY_QUESTIONS = [
+
+ {
+  id:"social",
+  title:"Comment te sens-tu avec les autres ?",
+  options:[
+   ["introvert","Je préfère les petits groupes et les moments calmes."],
+   ["balanced","Je suis à l'aise seul comme avec les autres."],
+   ["social","J'aime beaucoup rencontrer et échanger avec les autres."]
+  ]
+ },
+
+ {
+  id:"communication",
+  title:"Comment communiques-tu dans une relation ?",
+  options:[
+   ["reserved","Je prends du temps avant de parler de mes émotions."],
+   ["direct","Je préfère parler clairement et directement."],
+   ["emotional","J'exprime facilement ce que je ressens."]
+  ]
+ },
+
+ {
+  id:"stability",
+  title:"Que recherches-tu principalement ?",
+  options:[
+   ["freedom","De la liberté et de l'espace personnel."],
+   ["balance","Un équilibre entre liberté et proximité."],
+   ["stability","Une relation stable et rassurante."]
+  ]
+ },
+
+ {
+  id:"conflict",
+  title:"Lors d'un désaccord, tu as plutôt tendance à...",
+  options:[
+   ["calm","Prendre du recul pour retrouver mon calme."],
+   ["dialogue","Chercher rapidement le dialogue."],
+   ["intense","Exprimer fortement ce que je ressens."]
+  ]
+ },
+
+ {
+  id:"trust",
+  title:"La confiance pour toi se construit...",
+  options:[
+   ["slow","Progressivement avec le temps."],
+   ["natural","Naturellement grâce aux échanges."],
+   ["fast","Rapidement lorsque le feeling est bon."]
+  ]
+ },
+
+ {
+  id:"affection",
+  title:"Comment montres-tu ton attachement ?",
+  options:[
+   ["actions","Par mes actes et ma présence."],
+   ["words","Par les paroles et les échanges."],
+   ["touch","Par la proximité et les marques d'affection."]
+  ]
+ },
+
+ {
+  id:"future",
+  title:"Quelle importance accordes-tu aux projets communs ?",
+  options:[
+   ["low","Je préfère vivre davantage au présent."],
+   ["medium","J'aime avoir quelques projets communs."],
+   ["high","Les projets d'avenir sont très importants."]
+  ]
+ },
+
+ {
+  id:"loyalty",
+  title:"Quelle valeur accordes-tu à la fidélité ?",
+  options:[
+   ["important","C'est une valeur importante."],
+   ["essential","C'est indispensable dans une relation."],
+   ["open","Je préfère définir ensemble les règles de la relation."]
+  ]
+ },
+
+ {
+  id:"independence",
+  title:"Dans une relation, ton besoin d'indépendance est...",
+  options:[
+   ["high","Très important."],
+   ["medium","Important mais adaptable."],
+   ["low","Je préfère beaucoup de proximité."]
+  ]
+ },
+
+ {
+  id:"expectation",
+  title:"Qu'attends-tu principalement d'un partenaire ?",
+  options:[
+   ["complicity","De la complicité et du partage."],
+   ["security","De la confiance et de la stabilité."],
+   ["passion","De la passion et de l'intensité."]
+  ]
+ }
+
+];
 
 const ROSICRUCIAN_SYMBOLS = [
 
@@ -701,6 +842,57 @@ function formatGender(gender){
   return "Non-binaire";
 
  return "Non renseigné";
+}
+
+
+function renderPersonalityQuestions(){
+
+ const container =
+  document.getElementById(
+   "personalityQuestions"
+  );
+
+ if(!container)return;
+
+ container.innerHTML =
+ PERSONALITY_QUESTIONS.map(
+  (question,index) => `
+
+  <div class="card">
+
+   <h3>
+    ${index+1}. ${question.title}
+   </h3>
+
+   ${question.options.map(
+    option => `
+
+    <label
+     style="
+      display:block;
+      padding:10px;
+      margin:6px 0;
+      border:1px solid #ddd;
+      border-radius:12px;
+     ">
+
+     <input
+      type="radio"
+      name="personality_${question.id}"
+      value="${option[0]}"
+      style="width:auto;margin-right:8px">
+
+     ${option[1]}
+
+    </label>
+
+    `
+   ).join("")}
+
+  </div>
+
+  `
+ ).join("");
 }
 
 function getSearchBadge(category){
@@ -1470,6 +1662,332 @@ async function loadMyAlchemy(){
 }
 
 
+
+
+async function calculatePersonality(){
+
+ const answers = {};
+
+ for(const question of PERSONALITY_QUESTIONS){
+
+  const selected =
+   document.querySelector(
+    'input[name="personality_'+
+    question.id+
+    '"]:checked'
+   );
+
+  if(!selected){
+
+   alert(
+    "Réponds à toutes les questions."
+   );
+
+   return;
+  }
+
+  answers[question.id] =
+   selected.value;
+ }
+
+ let scores = {
+  introvert:0,
+  social:0,
+  direct:0,
+  emotional:0,
+  reserved:0,
+  stability:0,
+  freedom:0,
+  balanced:0,
+  calm:0,
+  dialogue:0,
+  intense:0,
+  trustSlow:0,
+  trustFast:0,
+  affectionActions:0,
+  affectionWords:0,
+  affectionTouch:0,
+  future:0,
+  independence:0,
+  complicity:0,
+  security:0,
+  passion:0
+ };
+
+ if(answers.social === "introvert")
+  scores.introvert++;
+
+ if(answers.social === "social")
+  scores.social++;
+
+ if(answers.communication === "direct")
+  scores.direct++;
+
+ if(answers.communication === "emotional")
+  scores.emotional++;
+
+ if(answers.communication === "reserved")
+  scores.reserved++;
+
+ if(answers.stability === "stability")
+  scores.stability++;
+
+ if(answers.stability === "freedom")
+  scores.freedom++;
+
+ if(answers.stability === "balance")
+  scores.balanced++;
+
+ if(answers.conflict === "calm")
+  scores.calm++;
+
+ if(answers.conflict === "dialogue")
+  scores.dialogue++;
+
+ if(answers.conflict === "intense")
+  scores.intense++;
+
+ if(answers.trust === "slow")
+  scores.trustSlow++;
+
+ if(answers.trust === "fast")
+  scores.trustFast++;
+
+ if(answers.affection === "actions")
+  scores.affectionActions++;
+
+ if(answers.affection === "words")
+  scores.affectionWords++;
+
+ if(answers.affection === "touch")
+  scores.affectionTouch++;
+
+ if(answers.future === "high")
+  scores.future++;
+
+ if(answers.independence === "high")
+  scores.independence++;
+
+ if(answers.expectation === "complicity")
+  scores.complicity++;
+
+ if(answers.expectation === "security")
+  scores.security++;
+
+ if(answers.expectation === "passion")
+  scores.passion++;
+
+ let type = "Profil équilibré";
+
+ if(
+  scores.social > scores.introvert &&
+  scores.social > 0
+ ){
+  type = "Profil sociable";
+ }
+
+ else if(
+  scores.introvert > scores.social
+ ){
+  type = "Profil réfléchi";
+ }
+
+ else if(
+  scores.stability >
+  scores.freedom
+ ){
+  type = "Profil recherchant la stabilité";
+ }
+
+ else if(
+  scores.freedom >
+  scores.stability
+ ){
+  type = "Profil indépendant";
+ }
+
+ let communication =
+  "Communication adaptable";
+
+ if(scores.direct > scores.emotional &&
+    scores.direct > scores.reserved)
+  communication =
+   "Communication directe";
+
+ else if(scores.emotional > scores.reserved)
+  communication =
+   "Communication expressive";
+
+ else if(scores.reserved > scores.direct)
+  communication =
+   "Communication plutôt réservée";
+
+ let relationship =
+  "Recherche d'un équilibre relationnel";
+
+ if(scores.stability > scores.freedom)
+  relationship =
+   "Recherche de stabilité et de sécurité";
+
+ else if(scores.freedom > scores.stability)
+  relationship =
+   "Besoin important de liberté personnelle";
+
+ let conflict =
+  "Tendance à rechercher un compromis";
+
+ if(scores.calm > scores.dialogue &&
+    scores.calm > scores.intense)
+  conflict =
+   "Tendance à prendre du recul avant de résoudre un conflit";
+
+ else if(scores.dialogue > scores.intense)
+  conflict =
+   "Tendance à privilégier le dialogue";
+
+ else if(scores.intense > scores.dialogue)
+  conflict =
+   "Réactions émotionnelles plus marquées lors des désaccords";
+
+ let expectation =
+  "Complicité et partage";
+
+ if(scores.security > scores.complicity &&
+    scores.security > scores.passion)
+  expectation =
+   "Confiance et sécurité";
+
+ else if(scores.passion > scores.complicity &&
+         scores.passion > scores.security)
+  expectation =
+   "Passion et intensité";
+
+ let strengths = [];
+
+ if(scores.dialogue)
+  strengths.push("dialogue");
+
+ if(scores.stability)
+  strengths.push("stabilité");
+
+ if(scores.complicity)
+  strengths.push("complicité");
+
+ if(scores.social)
+  strengths.push("sociabilité");
+
+ if(scores.independence)
+  strengths.push("autonomie");
+
+ if(!strengths.length)
+  strengths.push("adaptabilité");
+
+ let expectations = [];
+
+ if(scores.future)
+  expectations.push("projets communs");
+
+ if(scores.security)
+  expectations.push("confiance");
+
+ if(scores.complicity)
+  expectations.push("complicité");
+
+ if(scores.passion)
+  expectations.push("intensité");
+
+ if(!expectations.length)
+  expectations.push("une relation équilibrée");
+
+ const result =
+  document.getElementById(
+   "personalityResult"
+  );
+
+ result.innerHTML = `
+
+ <div class="card">
+
+  <h2>🧠 Ton bilan</h2>
+
+  <h3>
+   ${type}
+  </h3>
+
+  <p>
+   <strong>Communication :</strong>
+   ${communication}
+  </p>
+
+  <p>
+   <strong>Fonctionnement relationnel :</strong>
+   ${relationship}
+  </p>
+
+  <p>
+   <strong>Gestion des désaccords :</strong>
+   ${conflict}
+  </p>
+
+  <p>
+   <strong>Attentes principales :</strong>
+   ${expectation}
+  </p>
+
+  <h3>💎 Points forts possibles</h3>
+
+  <p>
+   ${strengths.join(" · ")}
+  </p>
+
+  <h3>💕 Ce que tu peux rechercher</h3>
+
+  <p>
+   ${expectations.join(" · ")}
+  </p>
+
+  <h3>🔎 Ton profil relationnel</h3>
+
+  <p>
+   Ce questionnaire suggère surtout que tu sembles
+   rechercher une relation correspondant à tes besoins
+   de communication, de proximité et d'indépendance.
+  </p>
+
+  <p class="small">
+   Ce résultat est indicatif. Il ne constitue pas un
+   diagnostic psychologique et ne permet pas de déterminer
+   scientifiquement ton type de personnalité.
+  </p>
+
+ </div>
+
+ `;
+
+ try{
+
+  await db
+   .from("personality_results")
+   .insert({
+
+    user_id:user.id,
+    profile_type:type,
+    communication_style:communication,
+    relationship_style:relationship,
+    conflict_style:conflict,
+    main_expectation:expectation,
+    answers:answers
+
+   });
+
+ }catch(error){
+
+  console.log(
+   "Résultat non sauvegardé :",
+   error.message
+  );
+ }
+}
 
 function startRosicrucianMeditation(){
 
@@ -2268,6 +2786,26 @@ async function loadRosicrucianProfile(){
 
  `;
 
+}
+
+
+async function loadPersonality(){
+
+ renderPersonalityQuestions();
+
+ const result =
+  document.getElementById(
+   "personalityResult"
+  );
+
+ if(result){
+
+  result.innerHTML = `
+   <p class="small">
+    Réponds aux 10 questions pour obtenir ton bilan.
+   </p>
+  `;
+ }
 }
 
 async function loadProfile(){
