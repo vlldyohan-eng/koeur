@@ -1,26 +1,62 @@
-<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="theme-color" content="#ff3d78">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Koeur ♥</title>
+const { data, error } = await db.auth.signUp({
+    email,
+    password,
+    options: {
+        data: {
+            display_name,
+            birth_date,
+            gender,
+            looking_for,
+            relationship_status,
+            search_category,
+            city,
+            bio
+        }
+    }
+});
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-window.addEventListener(
-    "error",
-    function(event){
-        console.error("Koeur JavaScript:", event.error || event.message);
-    }
-);
-window.addEventListener(
-    "unhandledrejection",
-    function(event){
-        console.error("Koeur Promise:", event.reason);
-    }
-);
-</script>
+if (error) {
+    msg.textContent = error.message;
+    return;
+}
+
+if (!data || !data.user) {
+    msg.textContent = "Supabase n'a pas créé le compte.";
+    return;
+}
+
+// IMPORTANT : si confirmation e-mail activée,
+// il n'y a pas encore de session.
+// Le trigger Supabase crée automatiquement le profil.
+if (!data.session) {
+    msg.textContent =
+        "Compte créé ✅ Vérifie ton email puis reconnecte-toi.";
+    return;
+}
+
+// Seulement lorsqu'une session existe,
+// on peut modifier profiles depuis le navigateur.
+const { error: profileError } = await db
+    .from("profiles")
+    .upsert({
+        id: data.user.id,
+        display_name,
+        birth_date,
+        gender,
+        looking_for,
+        relationship_status,
+        search_category,
+        city,
+        bio,
+        updated_at: new Date().toISOString()
+    });
+
+if (profileError) {
+    msg.textContent = profileError.message;
+    return;
+}
+
+msg.textContent = "Compte créé ✅";
 
 
 <style>
