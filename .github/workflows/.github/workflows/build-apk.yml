@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
   workflow_dispatch:
 
 permissions:
@@ -15,44 +16,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: 📥 Récupérer le projet
         uses: actions/checkout@v5
 
-      - name: Installer Java 17
+      - name: ☕ Installer Java 17
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: '17'
 
-      - name: Préparer Gradle
+      - name: 🔧 Préparer Gradle
         run: |
           chmod +x ./gradlew
           ./gradlew --version
 
-      - name: Nettoyer
+      - name: 🧹 Nettoyer le projet
         run: |
           ./gradlew clean --no-daemon
 
-      - name: Compiler l'APK
+      - name: 🔨 Compiler Koeur
         run: |
           ./gradlew :app:assembleDebug \
             --stacktrace \
             --no-daemon
 
-      - name: Vérifier l'APK
+      - name: 🔍 Vérifier l'APK
         run: |
           APK="app/build/outputs/apk/debug/app-debug.apk"
 
           if [ ! -f "$APK" ]; then
-            echo "APK introuvable"
+            echo "❌ APK introuvable : $APK"
             exit 1
           fi
 
-          echo "APK créé avec succès"
+          echo "✅ APK créé avec succès"
           ls -lh "$APK"
 
-      - name: Publier l'APK
+      - name: 📦 Publier l'APK
         uses: actions/upload-artifact@v4
+        with:
+          name: koeur-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
         with:
           name: koeur-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
