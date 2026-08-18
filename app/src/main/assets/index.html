@@ -285,6 +285,73 @@ Chargement...
 
 </section>
 
+
+<section id="rosicrucian">
+
+<h1>🌹 Rose-Croix</h1>
+
+<div class="card">
+
+<h2>🔮 Mon profil symbolique</h2>
+
+<p>
+Découvre un profil inspiré de symboles et thèmes
+traditionnellement associés à l'ésotérisme rosicrucien.
+</p>
+
+<p class="small">
+Cette fonctionnalité est une interprétation symbolique
+et personnelle. Elle ne constitue pas un enseignement
+officiel d'une organisation rosicrucienne.
+</p>
+
+<button onclick="generateRosicrucianProfile()">
+✨ Générer mon profil
+</button>
+
+<div id="rosicrucianResult"></div>
+
+</div>
+
+<div class="card">
+
+<h2>🌹 Méditation symbolique</h2>
+
+<p>
+Prends quelques instants pour réfléchir à une qualité
+que tu souhaites développer aujourd'hui.
+</p>
+
+<select id="rosicrucianVirtue">
+
+<option value="wisdom">Sagesse</option>
+<option value="peace">Paix intérieure</option>
+<option value="truth">Vérité</option>
+<option value="compassion">Compassion</option>
+<option value="courage">Courage</option>
+<option value="harmony">Harmonie</option>
+<option value="self_knowledge">Connaissance de soi</option>
+
+</select>
+
+<button onclick="startRosicrucianMeditation()">
+🕯️ Commencer
+</button>
+
+<div id="meditationResult"></div>
+
+</div>
+
+<div class="card">
+
+<h2>🌹 Symbole du jour</h2>
+
+<div id="dailyRoseSymbol"></div>
+
+</div>
+
+</section>
+
 <section id="profile">
 
 <h1>Mon profil 👤</h1>
@@ -390,6 +457,10 @@ Se déconnecter
 ⚗️<br>Alchimie
 </button>
 
+<button onclick="show('rosicrucian');loadRosicrucianProfile()">
+🌹<br>Rose-Croix
+</button>
+
 <button onclick="show('profile');loadProfile()">
 👤<br>Profil
 </button>
@@ -400,6 +471,99 @@ Se déconnecter
 
 <script>
 
+
+
+const ROSICRUCIAN_SYMBOLS = [
+
+ {
+  name:"La Rose",
+  symbol:"🌹",
+  theme:"Épanouissement",
+  meaning:"Symbolise l'ouverture intérieure et la beauté de la transformation."
+ },
+
+ {
+  name:"La Lumière",
+  symbol:"☀️",
+  theme:"Clarté",
+  meaning:"Symbolise la recherche de compréhension et de connaissance."
+ },
+
+ {
+  name:"La Croix",
+  symbol:"✝️",
+  theme:"Union",
+  meaning:"Symbolise la rencontre des opposés et la recherche d'équilibre."
+ },
+
+ {
+  name:"Le Soleil",
+  symbol:"☉",
+  theme:"Vitalité",
+  meaning:"Symbolise la lumière, la conscience et l'énergie intérieure."
+ },
+
+ {
+  name:"L'Étoile",
+  symbol:"✦",
+  theme:"Orientation",
+  meaning:"Symbolise la recherche d'une direction et d'un idéal."
+ },
+
+ {
+  name:"Le Lotus",
+  symbol:"🪷",
+  theme:"Transformation",
+  meaning:"Symbolise l'évolution intérieure et le passage de l'ombre vers la lumière."
+ },
+
+ {
+  name:"Le Sablier",
+  symbol:"⌛",
+  theme:"Temps",
+  meaning:"Invite à réfléchir au temps, à la patience et à l'instant présent."
+ }
+
+];
+
+const ROSICRUCIAN_VIRTUES = {
+
+ wisdom:{
+  title:"Sagesse",
+  text:"Observe avant de juger et cherche à comprendre avant de conclure."
+ },
+
+ peace:{
+  title:"Paix intérieure",
+  text:"Accorde-toi quelques instants de silence et observe simplement ta respiration."
+ },
+
+ truth:{
+  title:"Vérité",
+  text:"Interroge-toi avec honnêteté sur ce que tu penses, ressens et souhaites réellement."
+ },
+
+ compassion:{
+  title:"Compassion",
+  text:"Cherche aujourd'hui une manière simple d'apporter de la bienveillance à quelqu'un."
+ },
+
+ courage:{
+  title:"Courage",
+  text:"Identifie une difficulté que tu évites et réfléchis à un premier petit pas."
+ },
+
+ harmony:{
+  title:"Harmonie",
+  text:"Cherche un équilibre entre tes besoins, tes relations et tes responsabilités."
+ },
+
+ self_knowledge:{
+  title:"Connaissance de soi",
+  text:"Observe une habitude ou une réaction personnelle sans la juger."
+ }
+
+};
 
 const TOTEMS = {
 
@@ -1305,6 +1469,135 @@ async function loadMyAlchemy(){
  `;
 }
 
+
+
+function startRosicrucianMeditation(){
+
+ const value =
+  document.getElementById(
+   "rosicrucianVirtue"
+  ).value;
+
+ const virtue =
+  ROSICRUCIAN_VIRTUES[value];
+
+ const result =
+  document.getElementById(
+   "meditationResult"
+  );
+
+ result.innerHTML = `
+
+ <div class="card">
+
+  <h3>🕯️ ${virtue.title}</h3>
+
+  <p>
+   ${virtue.text}
+  </p>
+
+  <p>
+   Ferme les yeux quelques instants,
+   respire calmement et garde cette intention
+   à l'esprit.
+  </p>
+
+ </div>
+
+ `;
+
+}
+
+async function generateRosicrucianProfile(){
+
+ const result =
+  document.getElementById(
+   "rosicrucianResult"
+  );
+
+ const symbols =
+  ROSICRUCIAN_SYMBOLS;
+
+ const symbol =
+  symbols[
+   Math.floor(
+    Math.random()*symbols.length
+   )
+  ];
+
+ const virtues =
+  Object.keys(
+   ROSICRUCIAN_VIRTUES
+  );
+
+ const virtue =
+  ROSICRUCIAN_VIRTUES[
+   virtues[
+    Math.floor(
+     Math.random()*virtues.length
+    )
+   ]
+  ];
+
+ result.innerHTML = `
+
+ <div class="card">
+
+  <div style="font-size:60px">
+   ${symbol.symbol}
+  </div>
+
+  <h2>
+   ${symbol.name}
+  </h2>
+
+  <p>
+   <strong>Thème :</strong>
+   ${symbol.theme}
+  </p>
+
+  <p>
+   ${symbol.meaning}
+  </p>
+
+  <hr>
+
+  <h3>
+   🌹 Qualité proposée : ${virtue.title}
+  </h3>
+
+  <p>
+   ${virtue.text}
+  </p>
+
+  <p class="small">
+   Lecture symbolique générée par Koeur.
+  </p>
+
+ </div>
+
+ `;
+
+ try{
+
+  await db
+   .from("rosicrucian_profiles")
+   .insert({
+
+    user_id:user.id,
+    symbol:symbol.name,
+    virtue:virtue.title
+
+   });
+
+ }catch(e){
+
+  console.log(
+   "Historique symbolique non enregistré"
+  );
+ }
+}
+
 async function generateTotem(){
 
  const keys =
@@ -1945,6 +2238,37 @@ async function getCompatibility(
 }
 
 /* ================= PROFIL ================= */
+
+
+async function loadRosicrucianProfile(){
+
+ loadDailyRoseSymbol();
+
+ const result =
+  document.getElementById(
+   "rosicrucianResult"
+  );
+
+ if(!result)return;
+
+ result.innerHTML = `
+
+ <div class="card">
+
+  <p>
+   🌹 Ton espace symbolique est prêt.
+  </p>
+
+  <p class="small">
+   Génère ton profil pour recevoir une lecture
+   symbolique personnalisée.
+  </p>
+
+ </div>
+
+ `;
+
+}
 
 async function loadProfile(){
 
